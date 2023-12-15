@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+th,
+td,
+tr {
+  padding: 15px;
+  border: solid 1px black;
+}
+
+th {
+  position: sticky;
+  top: 0px; /* 0px if you don't have a navbar, but something is required */
+  background: lightgray;
+  border-bottom: solid 1px black;
+}
