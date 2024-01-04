@@ -14,33 +14,39 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
+import { supabase } from "./database";
 
 export type MovieDetailsResponse = {
-  id: string;
+  id: number;
   title: string;
   created_at: string;
-  description: string;
+  description: string | null;
   release_date?: string | null;
   production?: string | null;
   movies_genres: {
-    genre: string;
+    genre: string | null;
   }[];
   movie_credits: {
-    name: string;
-    role: string;
+    name: string | null;
+    role: string | null;
   }[];
   movie_providers: {
-    provider_name: string;
-    provider_type: "free" | "rent" | "buy";
+    provider_name: string | null;
+    provider_type: string;
   }[];
 };
 
 const useMovies = async (): Promise<{ movies: MovieDetailsResponse[] }> => {
-  const res = await fetch(
-    "https://watchlist-bn4a.onrender.com/api/v1/watchlist"
-  );
+  const { data, error } = await supabase
+    .from("movies")
+    .select(
+      "*, movie_credits(name, role), movies_genres(genre), movie_providers(provider_name, provider_type)"
+    );
 
-  return await res.json();
+  if (error) {
+    throw new Error(error.message);
+  }
+  return { movies: data };
 };
 
 // A debounced input react component
