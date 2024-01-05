@@ -6,24 +6,14 @@ const useAddMovie = () => {
   const queryClient = useQueryClient();
   return useMutation(
     async (title: string): Promise<void> => {
-      const result = await supabase.functions.invoke("add_movie", {
+      const { data, error } = await supabase.functions.invoke("add_movie", {
         method: "POST",
         body: JSON.stringify({ title }),
       });
-      console.log(result);
-
-      // const res = await fetch(
-      //   "https://watchlist-bn4a.onrender.com/api/v1/watchlist",
-      //   {
-      //     method: "POST",
-      //     body: JSON.stringify({ title }),
-      //     headers: {
-      //       "Content-type": "application/json",
-      //     },
-      //   }
-      // );
-
-      // return await res.json();
+      if (error) {
+        throw error;
+      }
+      return data;
     },
     {
       onSuccess: async () => {
@@ -54,7 +44,7 @@ const AddMovie: React.FC = () => {
       <input
         type="text"
         className="border-2 p-2 w-[400px] border-black"
-        placeholder="Movie title"
+        placeholder="Add a movie to your watchlist"
         onChange={handleChange}
         value={title}
       />

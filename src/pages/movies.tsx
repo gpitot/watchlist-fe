@@ -11,11 +11,14 @@ import {
   createColumnHelper,
   getSortedRowModel,
   SortingState,
+  RowSelectionState,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { useUserContext } from "providers/user_provider";
 import { useNavigate } from "react-router-dom";
 import { useGetMovies, MovieDetailsResponse } from "api/movies";
+import { MovieModal } from "pages/movie-modal";
+import { Stars } from "components/stars";
 
 // A debounced input react component
 function DebouncedInput({
@@ -80,6 +83,21 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
       header: "Description",
       enableColumnFilter: false,
       enableSorting: false,
+      cell: (desc) => `${desc.getValue()?.slice(0, 200)}...`,
+    }),
+    columnHelper.accessor("watched", {
+      header: "Watched",
+      enableColumnFilter: false,
+      enableSorting: true,
+      cell: (watched) => (watched.getValue() ? "✅" : ""),
+    }),
+    columnHelper.accessor("rating", {
+      header: "Rating",
+      enableColumnFilter: false,
+      enableSorting: true,
+      cell: (rating) => <Stars rating={rating.getValue() ?? 0} />,
+      minSize: 1050,
+      size: 500,
     }),
     columnHelper.accessor("release_date", {
       header: "Release Date",
@@ -137,6 +155,22 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
   ];
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [currentMovie, setCurrentMovie] = useState<MovieDetailsResponse>();
+
+  useEffect(() => {
+    if (rowSelection !== undefined) {
+      const rowsSelected = Object.keys(rowSelection);
+      if (rowsSelected.length > 0) {
+        const index = Number(rowsSelected[0]);
+        setCurrentMovie(data[index]);
+        setModalIsOpen(true);
+      }
+      // setCurrentMovie(data[rowSelection[0]]);
+    }
+  }, [rowSelection]);
 
   const table = useReactTable({
     data,
@@ -144,6 +178,7 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
     state: {
       columnFilters,
       sorting,
+      rowSelection, //pass the row selection state back to the table instance
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -151,71 +186,81 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
     debugTable: true,
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    onRowSelectionChange: setRowSelection,
+    enableMultiRowSelection: false,
   });
   return (
-    <table>
-      <thead>
-        {table.getHeaderGroups().map((headers) => (
-          <tr key={headers.id}>
-            {headers.headers.map((header) => (
-              <th
-                key={header.id}
-                {...{
-                  className: classNames({
-                    "cursor-pointer": header.column.getCanSort(),
-                  }),
-                  onClick: header.column.getToggleSortingHandler(),
-                }}
-              >
-                {flexRender(
-                  header.column.columnDef.header,
-                  header.getContext()
-                )}
-                {header.column.getCanFilter() ? (
-                  <div>
-                    <Filter column={header.column} table={table} />
-                  </div>
-                ) : null}
-                {{
-                  asc: " 🔼",
-                  desc: " 🔽",
-                }[header.column.getIsSorted() as string] ?? null}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-
-      <tbody>
-        {table.getRowModel().rows.map((row) => {
-          const hasFreeProviders = row
-            .getValue<MovieDetailsResponse["movie_providers"]>(
-              "movie_providers"
-            )
-            .some((p) => p.provider_type === "free");
-
-          return (
-            <tr
-              key={row.id}
-              className={classNames({
-                "bg-green-300": hasFreeProviders,
-              })}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="p-1">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
+    <>
+      <MovieModal
+        isOpen={modalIsOpen}
+        setIsOpen={setModalIsOpen}
+        movie={currentMovie}
+      />
+      <table>
+        <thead>
+          {table.getHeaderGroups().map((headers) => (
+            <tr key={headers.id}>
+              {headers.headers.map((header) => (
+                <th
+                  key={header.id}
+                  {...{
+                    className: classNames({
+                      "cursor-pointer": header.column.getCanSort(),
+                    }),
+                    onClick: header.column.getToggleSortingHandler(),
+                  }}
+                >
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
+                  {header.column.getCanFilter() ? (
+                    <div>
+                      <Filter column={header.column} table={table} />
+                    </div>
+                  ) : null}
+                  {{
+                    asc: " 🔼",
+                    desc: " 🔽",
+                  }[header.column.getIsSorted() as string] ?? null}
+                </th>
               ))}
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          ))}
+        </thead>
+
+        <tbody>
+          {table.getRowModel().rows.map((row) => {
+            const hasFreeProviders = row
+              .getValue<MovieDetailsResponse["movie_providers"]>(
+                "movie_providers"
+              )
+              .some((p) => p.provider_type === "free");
+
+            return (
+              <tr
+                key={row.id}
+                className={classNames({
+                  "bg-green-300": hasFreeProviders,
+                })}
+                onClick={row.getToggleSelectedHandler()}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td key={cell.id} className="p-1">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </>
   );
 };
 export const Movies: React.FC = () => {
   const { user, isLoggedIn, loading } = useUserContext();
-  console.log("user ", user, isLoggedIn);
+
   const navigate = useNavigate();
 
   const { isLoading, isError, data } = useGetMovies(user?.id);
