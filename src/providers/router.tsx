@@ -19,6 +19,10 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/share/:userId",
+        element: <Movies />,
+      },
+      {
         path: "/login",
         element: <LoginPage />,
       },

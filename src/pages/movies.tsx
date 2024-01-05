@@ -15,7 +15,7 @@ import {
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 import { useUserContext } from "providers/user_provider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetMovies, MovieDetailsResponse } from "api/movies";
 import { MovieModal } from "pages/movie-modal";
 import { Stars } from "components/stars";
@@ -260,10 +260,12 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
 };
 export const Movies: React.FC = () => {
   const { user, isLoggedIn, loading } = useUserContext();
+  const { userId } = useParams();
+  console.log("userid", userId);
 
   const navigate = useNavigate();
 
-  const { isLoading, isError, data } = useGetMovies(user?.id);
+  const { isLoading, isError, data } = useGetMovies(userId ?? user?.id);
 
   useEffect(() => {
     if (!isLoggedIn && !loading) {
