@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import { useQuery } from "react-query";
 
 import {
   Column,
@@ -14,40 +13,9 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
-import { supabase } from "./database";
-
-export type MovieDetailsResponse = {
-  id: number;
-  title: string;
-  created_at: string;
-  description: string | null;
-  release_date?: string | null;
-  production?: string | null;
-  movies_genres: {
-    genre: string | null;
-  }[];
-  movie_credits: {
-    name: string | null;
-    role: string | null;
-  }[];
-  movie_providers: {
-    provider_name: string | null;
-    provider_type: string;
-  }[];
-};
-
-const useMovies = async (): Promise<{ movies: MovieDetailsResponse[] }> => {
-  const { data, error } = await supabase
-    .from("movies")
-    .select(
-      "*, movie_credits(name, role), movies_genres(genre), movie_providers(provider_name, provider_type)"
-    );
-
-  if (error) {
-    throw new Error(error.message);
-  }
-  return { movies: data };
-};
+import { useUserContext } from "providers/user_provider";
+import { useNavigate } from "react-router-dom";
+import { useGetMovies, MovieDetailsResponse } from "api/movies";
 
 // A debounced input react component
 function DebouncedInput({
@@ -244,7 +212,17 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
   );
 };
 export const Movies: React.FC = () => {
-  const { isLoading, isError, data } = useQuery("movies", useMovies);
+  const { user, isLoggedIn, loading } = useUserContext();
+  console.log("user ", user, isLoggedIn);
+  const navigate = useNavigate();
+
+  const { isLoading, isError, data } = useGetMovies(user?.id);
+
+  useEffect(() => {
+    if (!isLoggedIn && !loading) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, loading]);
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !data) return <h1>Error</h1>;

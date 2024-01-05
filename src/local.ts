@@ -1,4 +1,4 @@
-import { MovieDetailsResponse } from "./movies";
+import { MovieDetailsResponse } from "./pages/movies";
 
 export const movies: MovieDetailsResponse[] = [
   {

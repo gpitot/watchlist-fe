@@ -1,3 +1,4 @@
+import { supabase } from "api/database";
 import { FormEvent, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 
@@ -5,18 +6,24 @@ const useAddMovie = () => {
   const queryClient = useQueryClient();
   return useMutation(
     async (title: string): Promise<void> => {
-      const res = await fetch(
-        "https://watchlist-bn4a.onrender.com/api/v1/watchlist",
-        {
-          method: "POST",
-          body: JSON.stringify({ title }),
-          headers: {
-            "Content-type": "application/json",
-          },
-        }
-      );
+      const result = await supabase.functions.invoke("add_movie", {
+        method: "POST",
+        body: JSON.stringify({ title }),
+      });
+      console.log(result);
 
-      return await res.json();
+      // const res = await fetch(
+      //   "https://watchlist-bn4a.onrender.com/api/v1/watchlist",
+      //   {
+      //     method: "POST",
+      //     body: JSON.stringify({ title }),
+      //     headers: {
+      //       "Content-type": "application/json",
+      //     },
+      //   }
+      // );
+
+      // return await res.json();
     },
     {
       onSuccess: async () => {
