@@ -1,11 +1,14 @@
 import { Auth } from "@supabase/auth-ui-react";
-import { ThemeMinimal } from "@supabase/auth-ui-shared";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { Session } from "@supabase/supabase-js";
 import React, { useEffect, useState } from "react";
 import { supabase } from "api/database";
+import { useNavigate } from "react-router-dom";
 
 export const LoginPage: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -16,6 +19,9 @@ export const LoginPage: React.FC = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      if (session) {
+        navigate("/");
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -23,13 +29,20 @@ export const LoginPage: React.FC = () => {
 
   if (!session) {
     return (
-      <Auth
-        supabaseClient={supabase}
-        appearance={{ theme: ThemeMinimal }}
-        providers={[]}
-      />
+      <div className="p-4 ">
+        <Auth
+          supabaseClient={supabase}
+          appearance={{
+            theme: ThemeSupa,
+            className: {
+              button: "text-black border-black ",
+            },
+          }}
+          providers={[]}
+        />
+      </div>
     );
   }
 
-  return <div>Logged in!</div>;
+  return null;
 };

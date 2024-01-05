@@ -197,10 +197,12 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
           return (
             <tr
               key={row.id}
-              className={classNames({ "bg-green-300": hasFreeProviders })}
+              className={classNames({
+                "bg-green-300": hasFreeProviders,
+              })}
             >
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>
+                <td key={cell.id} className="p-1">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
