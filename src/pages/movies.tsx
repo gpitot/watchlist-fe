@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import { useQuery } from "react-query";
 
 import {
   Column,
@@ -14,34 +13,9 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
-
-export type MovieDetailsResponse = {
-  id: string;
-  title: string;
-  created_at: string;
-  description: string;
-  release_date?: string | null;
-  production?: string | null;
-  movies_genres: {
-    genre: string;
-  }[];
-  movie_credits: {
-    name: string;
-    role: string;
-  }[];
-  movie_providers: {
-    provider_name: string;
-    provider_type: "free" | "rent" | "buy";
-  }[];
-};
-
-const useMovies = async (): Promise<{ movies: MovieDetailsResponse[] }> => {
-  const res = await fetch(
-    "https://watchlist-bn4a.onrender.com/api/v1/watchlist"
-  );
-
-  return await res.json();
-};
+import { useUserContext } from "providers/user_provider";
+import { useNavigate } from "react-router-dom";
+import { useGetMovies, MovieDetailsResponse } from "api/movies";
 
 // A debounced input react component
 function DebouncedInput({
@@ -238,7 +212,17 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
   );
 };
 export const Movies: React.FC = () => {
-  const { isLoading, isError, data } = useQuery("movies", useMovies);
+  const { user, isLoggedIn, loading } = useUserContext();
+  console.log("user ", user, isLoggedIn);
+  const navigate = useNavigate();
+
+  const { isLoading, isError, data } = useGetMovies(user?.id);
+
+  useEffect(() => {
+    if (!isLoggedIn && !loading) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, loading]);
 
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !data) return <h1>Error</h1>;

@@ -1,16 +1,15 @@
 import { QueryClient, QueryClientProvider } from "react-query";
-import { Movies } from "./movies";
-import { AddMovie } from "./add-movie";
+import { UserProvider } from "providers/user_provider";
+import { Router } from "providers/router";
 
 const queryClient = new QueryClient();
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <>
-        <AddMovie />
-        <Movies />
-      </>
-    </QueryClientProvider>
+    <UserProvider>
+      <QueryClientProvider client={queryClient}>
+        <Router />
+      </QueryClientProvider>
+    </UserProvider>
   );
 }
 
