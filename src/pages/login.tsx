@@ -27,6 +27,7 @@ export const LoginPage: React.FC = () => {
         supabaseClient={supabase}
         appearance={{ theme: ThemeMinimal }}
         providers={["google"]}
+        onlyThirdPartyProviders
       />
     );
   }
