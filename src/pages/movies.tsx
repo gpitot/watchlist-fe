@@ -196,65 +196,70 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
         setIsOpen={setModalIsOpen}
         movie={currentMovie}
       />
-      <table>
-        <thead>
-          {table.getHeaderGroups().map((headers) => (
-            <tr key={headers.id}>
-              {headers.headers.map((header) => (
-                <th
-                  key={header.id}
-                  {...{
-                    className: classNames({
-                      "cursor-pointer": header.column.getCanSort(),
-                    }),
-                    onClick: header.column.getToggleSortingHandler(),
-                  }}
-                >
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                  {header.column.getCanFilter() ? (
-                    <div>
-                      <Filter column={header.column} table={table} />
-                    </div>
-                  ) : null}
-                  {{
-                    asc: " 🔼",
-                    desc: " 🔽",
-                  }[header.column.getIsSorted() as string] ?? null}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-
-        <tbody>
-          {table.getRowModel().rows.map((row) => {
-            const hasFreeProviders = row
-              .getValue<MovieDetailsResponse["movie_providers"]>(
-                "movie_providers"
-              )
-              .some((p) => p.provider_type === "free");
-
-            return (
-              <tr
-                key={row.id}
-                className={classNames({
-                  "bg-green-300": hasFreeProviders,
-                })}
-                onClick={row.getToggleSelectedHandler()}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="p-1">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
+      <div className="relative w-screen overflow-x-auto">
+        <table>
+          <thead>
+            {table.getHeaderGroups().map((headers) => (
+              <tr key={headers.id}>
+                {headers.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    {...{
+                      className: classNames({
+                        "cursor-pointer": header.column.getCanSort(),
+                      }),
+                      onClick: header.column.getToggleSortingHandler(),
+                    }}
+                  >
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                    {header.column.getCanFilter() ? (
+                      <div>
+                        <Filter column={header.column} table={table} />
+                      </div>
+                    ) : null}
+                    {{
+                      asc: " 🔼",
+                      desc: " 🔽",
+                    }[header.column.getIsSorted() as string] ?? null}
+                  </th>
                 ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </thead>
+
+          <tbody>
+            {table.getRowModel().rows.map((row) => {
+              const hasFreeProviders = row
+                .getValue<MovieDetailsResponse["movie_providers"]>(
+                  "movie_providers"
+                )
+                .some((p) => p.provider_type === "free");
+
+              return (
+                <tr
+                  key={row.id}
+                  className={classNames({
+                    "bg-green-300": hasFreeProviders,
+                  })}
+                  onClick={row.getToggleSelectedHandler()}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="p-1">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 };
