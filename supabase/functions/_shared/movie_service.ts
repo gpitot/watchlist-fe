@@ -11,6 +11,7 @@ type MovieDetails = {
   "watch/providers": {
     results?: {
       AU?: {
+        ads: { provider_name: string }[];
         flatrate: { provider_name: string }[];
         rent: { provider_name: string }[];
         buy: { provider_name: string }[];
@@ -68,8 +69,13 @@ export class MovieService {
     }
     const auResults = res.results.AU;
 
+    const freeProviders = [
+      ...(auResults.flatrate ?? []),
+      ...(auResults.ads ?? []),
+    ];
+
     return [
-      ...(auResults.flatrate ?? []).map((i) => {
+      ...freeProviders.map((i) => {
         return {
           name: i.provider_name,
           type: "free" as const,
@@ -90,7 +96,7 @@ export class MovieService {
     ];
   }
 
-  private async getMovieDetails(id: number): Promise<MovieDetailsResponse> {
+  public async getMovieDetails(id: number): Promise<MovieDetailsResponse> {
     const appended = encodeURI("credits,watch/providers");
     const res = await this.myfetch<MovieDetails>(
       `/movie/${id}?append_to_response=${appended}&language=en-US`
@@ -109,13 +115,13 @@ export class MovieService {
 
   public async queryMovieTitle(
     title: string
-  ): Promise<MovieDetailsResponse | undefined> {
+  ): Promise<{ id: number } | undefined> {
     const movieQuery = encodeURI(title);
     const res = await this.myfetch<{
       total_results: number;
       results: { id: number }[];
     }>(`/search/movie?query=${movieQuery}&language=en-US&page=1`);
     if (res.total_results === 0) return undefined;
-    return this.getMovieDetails(res.results[0].id);
+    return res.results[0];
   }
 }

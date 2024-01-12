@@ -125,37 +125,31 @@ export interface Database {
           created_at: string
           description: string | null
           id: number
-          movie_db_id: number | null
+          movie_db_id: number
           production: string | null
-          rating: number | null
           release_date: string | null
           title: string
           user_id: string | null
-          watched: boolean
         }
         Insert: {
           created_at?: string
           description?: string | null
           id?: number
-          movie_db_id?: number | null
+          movie_db_id: number
           production?: string | null
-          rating?: number | null
           release_date?: string | null
           title: string
           user_id?: string | null
-          watched?: boolean
         }
         Update: {
           created_at?: string
           description?: string | null
           id?: number
-          movie_db_id?: number | null
+          movie_db_id?: number
           production?: string | null
-          rating?: number | null
           release_date?: string | null
           title?: string
           user_id?: string | null
-          watched?: boolean
         }
         Relationships: [
           {
@@ -192,6 +186,48 @@ export interface Database {
             columns: ["movie_id"]
             isOneToOne: false
             referencedRelation: "movies"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      movies_users: {
+        Row: {
+          created_at: string
+          movie_id: number
+          notes: string | null
+          rating: number | null
+          user_id: string
+          watched: boolean
+        }
+        Insert: {
+          created_at?: string
+          movie_id: number
+          notes?: string | null
+          rating?: number | null
+          user_id: string
+          watched: boolean
+        }
+        Update: {
+          created_at?: string
+          movie_id?: number
+          notes?: string | null
+          rating?: number | null
+          user_id?: string
+          watched?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "movies_users_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "movies_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           }
         ]

@@ -31,15 +31,27 @@ export const useGetMovies = (userId?: string) => {
       const { data, error } = await supabase
         .from("movies")
         .select(
-          "*, movie_credits(name, role), movies_genres(genre), movie_providers(provider_name, provider_type)"
+          `*, 
+          movie_credits(name, role), 
+          movies_genres(genre), 
+          movie_providers(provider_name, provider_type),
+          movies_users(rating, watched)
+          `
         )
-        .match({ user_id: userId })
+        .match({ "movies_users.user_id": userId })
         .order("created_at", { ascending: false });
 
       if (error) {
         throw new Error(error.message);
       }
-      return { movies: data };
+
+      return {
+        movies: data.map((movie) => ({
+          ...movie,
+          watched: movie.movies_users[0].watched,
+          rating: movie.movies_users[0].rating,
+        })),
+      };
     },
   });
 };
@@ -48,13 +60,19 @@ export const useToggleWatched = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, watched }: { id: number; watched: boolean }) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("Not logged in");
+      }
       await supabase
-        .from("movies")
+        .from("movies_users")
         .update({
           watched: !watched,
           rating: !watched === false ? null : undefined,
         })
-        .eq("id", id);
+        .match({ movie_id: id, user_id: user.id });
     },
     onSuccess: () => {
       queryClient.invalidateQueries("movies");
@@ -66,13 +84,19 @@ export const useUpdateRating = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, rating }: { id: number; rating: number }) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("Not logged in");
+      }
       await supabase
-        .from("movies")
+        .from("movies_users")
         .update({
           rating,
           watched: true,
         })
-        .eq("id", id);
+        .match({ user_id: user.id, movie_id: id });
     },
     onSuccess: () => {
       queryClient.invalidateQueries("movies");
@@ -84,7 +108,16 @@ export const useRemoveMovie = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id }: { id: number }) => {
-      await supabase.from("movies").delete().eq("id", id);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("Not logged in");
+      }
+      await supabase
+        .from("movies_users")
+        .delete()
+        .match({ movie_id: id, user_id: user.id });
     },
     onSuccess: () => {
       queryClient.invalidateQueries("movies");
