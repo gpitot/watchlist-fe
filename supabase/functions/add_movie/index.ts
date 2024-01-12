@@ -128,7 +128,7 @@ Deno.serve(async (req) => {
         )
       `
       )
-      .match({ user_id: user.id, movie_id: movieId })
+      .match({ user_id: user.id, movie_id: dbMovieId })
       .single();
 
     if (error || !movieDetailsCachedResponse) {
