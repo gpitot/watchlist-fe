@@ -129,7 +129,6 @@ export interface Database {
           production: string | null
           release_date: string | null
           title: string
-          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -139,7 +138,6 @@ export interface Database {
           production?: string | null
           release_date?: string | null
           title: string
-          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -149,17 +147,8 @@ export interface Database {
           production?: string | null
           release_date?: string | null
           title?: string
-          user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "movies_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
+        Relationships: []
       }
       movies_genres: {
         Row: {
