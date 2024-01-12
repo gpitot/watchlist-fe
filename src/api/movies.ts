@@ -18,7 +18,7 @@ export type MovieDetailsResponse = {
     role: string | null;
   }[];
   movie_providers: {
-    provider_name: string | null;
+    provider_name: string;
     provider_type: string;
   }[];
 };

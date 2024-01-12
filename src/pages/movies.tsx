@@ -14,9 +14,7 @@ import {
   RowSelectionState,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
-import { useUserContext } from "providers/user_provider";
-import { useNavigate, useParams } from "react-router-dom";
-import { useGetMovies, MovieDetailsResponse } from "api/movies";
+import { MovieDetailsResponse } from "api/movies";
 import { MovieModal } from "pages/movie-modal";
 import { Stars } from "components/stars";
 
@@ -73,7 +71,10 @@ function Filter({
 }
 const columnHelper = createColumnHelper<MovieDetailsResponse>();
 
-const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
+const TableUI: React.FC<{
+  data: MovieDetailsResponse[];
+  availableProviders: string[];
+}> = ({ data, availableProviders }) => {
   const columns = [
     columnHelper.accessor("title", {
       header: "Title",
@@ -168,7 +169,6 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
         setCurrentMovie(data[index]);
         setModalIsOpen(true);
       }
-      // setCurrentMovie(data[rowSelection[0]]);
     }
   }, [rowSelection]);
 
@@ -236,7 +236,9 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
                 .getValue<MovieDetailsResponse["movie_providers"]>(
                   "movie_providers"
                 )
-                .some((p) => p.provider_type === "free");
+                .some((p) =>
+                  availableProviders.includes(p.provider_name ?? "")
+                );
 
               return (
                 <tr
@@ -263,22 +265,9 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
     </>
   );
 };
-export const Movies: React.FC = () => {
-  const { user, isLoggedIn, loading } = useUserContext();
-  const { userId } = useParams();
-
-  const navigate = useNavigate();
-
-  const { isLoading, isError, data } = useGetMovies(userId ?? user?.id);
-
-  useEffect(() => {
-    if (!isLoggedIn && !loading) {
-      navigate("/login");
-    }
-  }, [isLoggedIn, loading]);
-
-  if (isLoading) return <h1>Loading...</h1>;
-  if (isError || !data) return <h1>Error</h1>;
-
-  return <TableUI data={data.movies} />;
+export const Movies: React.FC<{
+  movies: MovieDetailsResponse[];
+  availableProviders: string[];
+}> = ({ movies, availableProviders }) => {
+  return <TableUI data={movies} availableProviders={availableProviders} />;
 };

@@ -1,8 +1,7 @@
 import { LoginPage } from "pages/login";
 import { Base } from "pages/Base";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { AddMovie } from "pages/add-movie";
-import { Movies } from "pages/movies";
+import { Homepage } from "pages/homepage";
 
 const router = createBrowserRouter([
   {
@@ -11,16 +10,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: (
-          <>
-            <AddMovie />
-            <Movies />
-          </>
-        ),
+        element: <Homepage />,
       },
       {
         path: "/share/:userId",
-        element: <Movies />,
+        element: <Homepage />,
       },
       {
         path: "/login",
