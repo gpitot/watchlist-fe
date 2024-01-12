@@ -266,7 +266,6 @@ const TableUI: React.FC<{ data: MovieDetailsResponse[] }> = ({ data }) => {
 export const Movies: React.FC = () => {
   const { user, isLoggedIn, loading } = useUserContext();
   const { userId } = useParams();
-  console.log("userid", userId);
 
   const navigate = useNavigate();
 

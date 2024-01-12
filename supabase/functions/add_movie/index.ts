@@ -116,11 +116,19 @@ Deno.serve(async (req) => {
     }
 
     const { error, data: movieDetailsCachedResponse } = await anonClient
-      .from("movies")
+      .from("movies_users")
       .select(
-        "*, movie_credits(name, role), movies_genres(genre), movie_providers(provider_name, provider_type)"
+        `
+        watched, rating,
+        movies(
+          *,
+          movie_credits(name, role), 
+          movies_genres(genre), 
+          movie_providers(provider_name, provider_type)
+        )
+      `
       )
-      .match({ user_id: user.id, id: dbMovieId })
+      .match({ user_id: user.id, movie_id: movieId })
       .single();
 
     if (error || !movieDetailsCachedResponse) {

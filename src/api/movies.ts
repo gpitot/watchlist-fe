@@ -29,28 +29,37 @@ export const useGetMovies = (userId?: string) => {
     enabled: userId !== undefined,
     queryFn: async (): Promise<{ movies: MovieDetailsResponse[] }> => {
       const { data, error } = await supabase
-        .from("movies")
+        .from("movies_users")
         .select(
-          `*, 
-          movie_credits(name, role), 
-          movies_genres(genre), 
-          movie_providers(provider_name, provider_type),
-          movies_users(rating, watched)
+          `
+          watched, rating,
+          movies(
+            *,
+            movie_credits(name, role), 
+            movies_genres(genre), 
+            movie_providers(provider_name, provider_type)
+          )
           `
         )
-        .match({ "movies_users.user_id": userId })
+        .match({ user_id: userId })
         .order("created_at", { ascending: false });
 
       if (error) {
         throw new Error(error.message);
       }
 
-      return {
-        movies: data.map((movie) => ({
+      const movies: MovieDetailsResponse[] = data.map((movie) => {
+        if (movie.movies === null) {
+          throw new Error("Movie not found");
+        }
+        return {
           ...movie,
-          watched: movie.movies_users[0].watched,
-          rating: movie.movies_users[0].rating,
-        })),
+          ...movie.movies,
+        };
+      });
+
+      return {
+        movies,
       };
     },
   });
