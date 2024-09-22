@@ -1,9 +1,61 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { Database } from "../_shared/database.types.ts";
-import { MovieService } from "../_shared/movie_service.ts";
+import { MovieAndShowService, Medium } from "../_shared/movie_service.ts";
 import { createClient } from "supabase";
+import * as StringSimilarity from "string-similarity";
 
-const movieService = new MovieService();
+const movieAndShowService = new MovieAndShowService();
+
+const determineMovieOrShow = async (
+  title: string
+): Promise<{ id: number; medium: Medium } | undefined> => {
+  const movie = await movieAndShowService.searchByTitle(title, "movie");
+  const tv = await movieAndShowService.searchByTitle(title, "tv");
+
+  if (movie && tv) {
+    const { id: movieId, name: movieName } = movie;
+    const { id: tvId, name: tvName } = tv;
+
+    const movieSimilarity = StringSimilarity.compareTwoStrings(
+      title,
+      movieName
+    );
+    const tvSimilarity = StringSimilarity.compareTwoStrings(title, tvName);
+
+    console.log(
+      "Movie and Tv found: ",
+      movieName,
+      tvName,
+      movieSimilarity,
+      tvSimilarity
+    );
+
+    if (movieSimilarity > tvSimilarity) {
+      return {
+        id: movieId,
+        medium: "movie",
+      };
+    }
+    return {
+      id: tvId,
+      medium: "tv",
+    };
+  }
+
+  if (movie) {
+    return {
+      id: movie.id,
+      medium: "movie",
+    };
+  }
+  if (tv) {
+    return {
+      id: tv.id,
+      medium: "tv",
+    };
+  }
+  return undefined;
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -30,25 +82,30 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { id: movieId } = (await movieService.queryMovieTitle(title)) ?? {};
+    const result = await determineMovieOrShow(title);
 
-    if (movieId === undefined) {
+    if (!result) {
       return new Response("Movie not found", {
         status: 404,
         headers: corsHeaders,
       });
     }
 
+    const { id: recordId, medium } = result;
+
     const { data } = await anonClient
       .from("movies")
       .select("*")
-      .match({ movie_db_id: movieId })
+      .match({ movie_db_id: recordId })
       .single();
 
     let dbMovieId = data?.id;
     if (data === null) {
       // add movie in
-      const movieDetails = await movieService.getMovieDetails(movieId);
+      const movieDetails = await movieAndShowService.getDetails(
+        recordId,
+        medium
+      );
       const { data: movie, error } = await anonClient
         .from("movies")
         .insert({
@@ -57,12 +114,13 @@ Deno.serve(async (req) => {
           description: movieDetails.description,
           release_date: movieDetails.release?.toISOString(),
           production: movieDetails.production,
+          medium: medium,
         })
         .select("*")
         .single();
 
       if (error || !movie) {
-        throw new Error(error.message ?? "Error adding movie");
+        throw new Error(error?.message ?? "Error adding movie");
       }
 
       dbMovieId = movie.id;

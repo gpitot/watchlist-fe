@@ -1,9 +1,9 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { Database } from "../_shared/database.types.ts";
-import { MovieService } from "../_shared/movie_service.ts";
+import { MovieAndShowService, isMedium } from "../_shared/movie_service.ts";
 import { createClient } from "supabase";
 
-const movieService = new MovieService();
+const movieService = new MovieAndShowService();
 
 const adminClient = createClient<Database>(
   Deno.env.get("SUPABASE_URL") ?? "",
@@ -35,18 +35,21 @@ Deno.serve(async (req) => {
 
     const { data } = await anonClient
       .from("movies_users")
-      .select("movie_id, movies(movie_db_id)")
+      .select("movie_id, movies(medium, movie_db_id)")
       .match({ user_id: user.id });
 
     for (const movie of data ?? []) {
-      if (!movie.movies?.movie_db_id) {
+      const movieId = movie.movie_id;
+      const { movie_db_id: movieDBId, medium } = movie.movies ?? {};
+
+      if (!movieDBId || !medium || !isMedium(medium)) {
         throw new Error("movie_db_id not found in database");
       }
 
-      const movieId = movie.movie_id;
-      const movieDBId = movie.movies.movie_db_id;
-
-      const updatedProviders = await movieService.getMovieProviders(movieDBId);
+      const updatedProviders = await movieService.getProviders(
+        movieDBId,
+        medium
+      );
 
       if (updatedProviders.length > 0) {
         // adminClient to delete

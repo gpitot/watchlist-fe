@@ -1,4 +1,5 @@
 type MovieDetails = {
+  name?: string; // for tv shows
   title: string;
   overview: string;
   release_date?: string;
@@ -34,7 +35,11 @@ export type MovieDetailsResponse = {
   providers: { name: string; type: "free" | "rent" | "buy" }[];
 };
 
-export class MovieService {
+export const isMedium = (medium: string): medium is Medium => {
+  return medium === "movie" || medium === "tv";
+};
+export type Medium = "movie" | "tv";
+export class MovieAndShowService {
   private AUTH_TOKEN: string;
 
   constructor() {
@@ -48,12 +53,12 @@ export class MovieService {
         accept: "application/json",
       },
     };
-    const res = await fetch(`https://api.themoviedb.org/3${url}`, options);
+    const res = await fetch(`https://api.themoviedb.org/3/${url}`, options);
     const json = await res.json();
     return json as T;
   }
 
-  private getCredits(credits: MovieDetails["credits"]) {
+  private parseCreditsResult(credits: MovieDetails["credits"]) {
     return {
       cast: credits.cast.slice(0, 5).map((item) => item.name),
       crew: credits.crew.slice(0, 5).map((item) => item.name),
@@ -95,39 +100,47 @@ export class MovieService {
     ];
   }
 
-  public async getMovieDetails(id: number): Promise<MovieDetailsResponse> {
+  public async getDetails(
+    id: number,
+    type: Medium
+  ): Promise<MovieDetailsResponse> {
     const appended = encodeURI("credits,watch/providers");
     const res = await this.myfetch<MovieDetails>(
-      `/movie/${id}?append_to_response=${appended}&language=en-US`
+      `/${type}/${id}?append_to_response=${appended}&language=en-US`
     );
     return {
       id,
-      title: res.title,
+      title: res.name ?? res.title,
       description: res.overview,
       release: res.release_date ? new Date(res.release_date) : undefined,
       production: (res.production_companies?.[0] ?? {}).name,
       genres: res.genres.map((g) => g.name),
-      credits: this.getCredits(res.credits),
+      credits: this.parseCreditsResult(res.credits),
       providers: this.parseStreamingProvidersResult(res["watch/providers"]),
     };
   }
 
-  public async getMovieProviders(id: number) {
+  public async getProviders(id: number, type: Medium) {
     const res = await this.myfetch<MovieDetails["watch/providers"]>(
-      `/movie/${id}/watch/providers`
+      `/${type}/${id}/watch/providers`
     );
     return this.parseStreamingProvidersResult(res);
   }
 
-  public async queryMovieTitle(
-    title: string
-  ): Promise<{ id: number } | undefined> {
+  public async searchByTitle(
+    title: string,
+    type: Medium
+  ): Promise<{ id: number; name: string } | undefined> {
     const movieQuery = encodeURI(title);
     const res = await this.myfetch<{
       total_results: number;
-      results: { id: number }[];
-    }>(`/search/movie?query=${movieQuery}&language=en-US&page=1`);
+      results: { id: number; name?: string; title: string }[];
+    }>(`/search/${type}?query=${movieQuery}&language=en-US&page=1`);
     if (res.total_results === 0) return undefined;
-    return res.results[0];
+    console.log(res.results[0]);
+    return {
+      id: res.results[0].id,
+      name: res.results[0].name ?? res.results[0].title,
+    };
   }
 }
