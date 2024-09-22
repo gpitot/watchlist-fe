@@ -20,7 +20,7 @@ export const Base: React.FC = () => {
 
   return (
     <article>
-      <header className="p-4 py-8  bg-blue-400 text-white  flex justify-between">
+      <header className="p-4 py-8  bg-blue-400 text-white  flex justify-between align-middle">
         <Link to="/">
           <h1 className="text-2xl">Movie watchlist</h1>
         </Link>

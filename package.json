@@ -9,12 +9,13 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "local:supabase": "supabase start --exclude realtime storage-api imgproxy kong inbucket",
+    "local:functions": "supabase functions serve",
     "db:types": "supabase gen types typescript --project-id ambmualoussdnneksprb > src/interfaces/database.types.ts && supabase gen types typescript --project-id ambmualoussdnneksprb > supabase/functions/_shared/database.types.ts"
   },
   "dependencies": {
     "@supabase/auth-ui-react": "^0.4.6",
     "@supabase/auth-ui-shared": "^0.1.8",
-    "@supabase/supabase-js": "^2.39.3",
+    "@supabase/supabase-js": "2.45.4",
     "@tanstack/react-table": "^8.10.7",
     "classnames": "^2.3.2",
     "react": "^18.2.0",

@@ -39,7 +39,6 @@ export class MovieService {
 
   constructor() {
     this.AUTH_TOKEN = `Bearer ${Deno.env.get("MOVIE_DB_TOKEN")}`;
-    console.log("AUTH_TOKEN", this.AUTH_TOKEN);
   }
 
   private async myfetch<T>(url: string): Promise<T> {
@@ -61,7 +60,7 @@ export class MovieService {
     };
   }
 
-  public getStreamingProviders(
+  public parseStreamingProvidersResult(
     res: MovieDetails["watch/providers"]
   ): MovieDetailsResponse["providers"] {
     if (!res.results || !res.results.AU) {
@@ -109,8 +108,15 @@ export class MovieService {
       production: (res.production_companies?.[0] ?? {}).name,
       genres: res.genres.map((g) => g.name),
       credits: this.getCredits(res.credits),
-      providers: this.getStreamingProviders(res["watch/providers"]),
+      providers: this.parseStreamingProvidersResult(res["watch/providers"]),
     };
+  }
+
+  public async getMovieProviders(id: number) {
+    const res = await this.myfetch<MovieDetails["watch/providers"]>(
+      `/movie/${id}/watch/providers`
+    );
+    return this.parseStreamingProvidersResult(res);
   }
 
   public async queryMovieTitle(

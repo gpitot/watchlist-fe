@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useGetMovies } from "api/movies";
 import { useEffect, useMemo, useState } from "react";
 import { Option } from "react-multi-select-component";
+import { RefreshProviders } from "pages/refresh_providers";
 
 export const Homepage: React.FC = () => {
   const { user, isLoggedIn, loading } = useUserContext();
@@ -49,6 +50,7 @@ export const Homepage: React.FC = () => {
           setSelected={setSelectedProviders}
           label={"Select Providers"}
         />
+        <RefreshProviders />
       </div>
 
       <Movies

@@ -133,3 +133,24 @@ export const useRemoveMovie = () => {
     },
   });
 };
+
+export const useRefreshProviders = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke(
+        "refresh_providers",
+        {
+          method: "POST",
+        }
+      );
+      if (error) {
+        throw error;
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries("movies");
+    },
+  });
+};
