@@ -80,12 +80,44 @@ const TableUI: React.FC<{
       header: "Title",
       enableSorting: false,
     }),
+
+    columnHelper.accessor("movies_genres", {
+      header: "Genres",
+      enableColumnFilter: false,
+      enableSorting: false,
+      cell: (genres) =>
+        genres
+          .getValue()
+          .map((g) => g.genre)
+          .join(", "),
+    }),
+    columnHelper.accessor("movie_providers", {
+      header: "Providers",
+      enableColumnFilter: false,
+      enableSorting: false,
+      cell: (providers) =>
+        providers
+          .getValue()
+          .filter((p) => p.provider_type === "free")
+          .map((p) => p.provider_name)
+          .join(", "),
+    }),
+
     columnHelper.accessor("description", {
       header: "Description",
       enableColumnFilter: false,
       enableSorting: false,
       cell: (desc) => `${desc.getValue()?.slice(0, 200)}...`,
     }),
+
+    columnHelper.accessor("release_date", {
+      header: "Release Date",
+      enableColumnFilter: false,
+      cell: (date) => date.getValue()?.slice(0, 10),
+      sortDescFirst: true,
+      enableSorting: true,
+    }),
+
     columnHelper.accessor("watched", {
       header: "Watched",
       enableColumnFilter: false,
@@ -100,59 +132,6 @@ const TableUI: React.FC<{
       minSize: 1050,
       size: 500,
     }),
-    columnHelper.accessor("release_date", {
-      header: "Release Date",
-      enableColumnFilter: false,
-      cell: (date) => date.getValue()?.slice(0, 10),
-      sortDescFirst: true,
-      enableSorting: true,
-    }),
-    columnHelper.accessor("movies_genres", {
-      header: "Genres",
-      enableColumnFilter: false,
-      enableSorting: false,
-      cell: (genres) =>
-        genres
-          .getValue()
-          .map((g) => g.genre)
-          .join(", "),
-    }),
-    columnHelper.accessor("production", {
-      header: "Production",
-      enableSorting: false,
-    }),
-    columnHelper.accessor("movie_providers", {
-      header: "Providers",
-      enableColumnFilter: false,
-      enableSorting: false,
-      cell: (providers) =>
-        providers
-          .getValue()
-          .filter((p) => p.provider_type === "free")
-          .map((p) => p.provider_name)
-          .join(", "),
-    }),
-    columnHelper.accessor("movie_credits", {
-      header: "Cast",
-      enableColumnFilter: false,
-      enableSorting: false,
-      cell: (credits) =>
-        credits
-          .getValue()
-          .filter((c) => c.role === "cast")
-          .map((cast) => cast.name)
-          .join(", "),
-    }),
-    // columnHelper.accessor("movie_credits", {
-    //   header: "Crew",
-    //   enableColumnFilter: false,
-    //   cell: (credits) =>
-    //     credits
-    //       .getValue()
-    //       .filter((c) => c.role === "crew")
-    //       .map((cast) => cast.name)
-    //       .join(", "),
-    // }),
   ];
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([]);

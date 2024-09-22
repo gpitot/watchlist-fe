@@ -19,7 +19,7 @@ export const Stars: React.FC<{
                   "text-yellow-500": isFilled,
                   "text-gray-500": !isFilled,
                 },
-                "cursor-pointer text-2xl"
+                "cursor-pointer text-2xl hover:text-yellow-500"
               )}
             >
               {isFilled ? "★" : "☆"}
