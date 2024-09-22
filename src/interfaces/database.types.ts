@@ -128,6 +128,7 @@ export type Database = {
           medium: string
           movie_db_id: number
           production: string | null
+          providers_refreshed_date: string
           release_date: string | null
           title: string
         }
@@ -138,6 +139,7 @@ export type Database = {
           medium: string
           movie_db_id: number
           production?: string | null
+          providers_refreshed_date: string
           release_date?: string | null
           title: string
         }
@@ -148,6 +150,7 @@ export type Database = {
           medium?: string
           movie_db_id?: number
           production?: string | null
+          providers_refreshed_date?: string
           release_date?: string | null
           title?: string
         }
