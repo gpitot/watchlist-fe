@@ -46,6 +46,9 @@ export const MovieModal: React.FC<{
 
   const rating = movie?.rating ?? 0;
 
+  const cast = movie?.movie_credits.filter((r) => r.role === "cast") ?? [];
+  const crew = movie?.movie_credits.filter((r) => r.role === "crew") ?? [];
+
   return (
     <div
       className={classNames({
@@ -72,26 +75,43 @@ export const MovieModal: React.FC<{
                   {movie.production}
                 </p>
               </div>
-              <div>
-                <p className="font-bold">Cast</p>
-                <ul className="font-extralight text-xs">
-                  {movie.movie_credits
-                    .filter((r) => r.role === "cast")
-                    .map((actor) => (
-                      <li key={actor.name}>{actor.name}</li>
+
+              {movie.movie_providers.length > 0 && (
+                <div>
+                  <p className="font-bold">Providers</p>
+                  <ul className="font-extralight text-xs">
+                    {movie.movie_providers.map((provider) => (
+                      <li key={provider.provider_name}>
+                        {provider.provider_name}
+                      </li>
                     ))}
-                </ul>
-              </div>
-              <div>
-                <p className="font-bold">Crew</p>
-                <ul className="font-extralight text-xs">
-                  {movie.movie_credits
-                    .filter((r) => r.role === "crew")
-                    .map((actor) => (
-                      <li key={actor.name}>{actor.name}</li>
-                    ))}
-                </ul>
-              </div>
+                  </ul>
+                </div>
+              )}
+              {cast.length > 0 && (
+                <div>
+                  <p className="font-bold">Cast</p>
+                  <ul className="font-extralight text-xs">
+                    {movie.movie_credits
+                      .filter((r) => r.role === "cast")
+                      .map((actor) => (
+                        <li key={actor.name}>{actor.name}</li>
+                      ))}
+                  </ul>
+                </div>
+              )}
+              {crew.length > 0 && (
+                <div>
+                  <p className="font-bold">Crew</p>
+                  <ul className="font-extralight text-xs">
+                    {movie.movie_credits
+                      .filter((r) => r.role === "crew")
+                      .map((actor) => (
+                        <li key={actor.name}>{actor.name}</li>
+                      ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
             <div className="flex space-x-2 pt-4">

@@ -115,6 +115,7 @@ Deno.serve(async (req) => {
           release_date: movieDetails.release?.toISOString(),
           production: movieDetails.production,
           medium: medium,
+          providers_refreshed_date: new Date().toISOString().slice(0, 10),
         })
         .select("*")
         .single();
