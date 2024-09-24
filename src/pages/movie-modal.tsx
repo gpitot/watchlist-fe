@@ -58,16 +58,38 @@ export const MovieModal: React.FC<{
     >
       <dialog
         open={isOpen}
-        className=" relative mx-auto my-10 p-4 rounded-md border-solid border-black border-2 max-w-lg"
+        className=" relative mx-auto my-10 p-4 rounded-md border-solid border-black border-2 max-w-lg max-h-96 overflow-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {movie && (
           <div className="space-y-2">
-            <h1 className="text-lg underline">{movie.title}</h1>
+            <div className="flex">
+              <h1 className="text-lg underline">{movie.title}</h1>
+
+              <button
+                className="border-solid border-2 border-black px-2 bg-gray-200 rounded-md ml-auto"
+                onClick={() => setIsOpen(false)}
+              >
+                X
+              </button>
+            </div>
             <p className="text-sm">{movie.description}</p>
 
             <Stars rating={rating} handleClick={updateRating} />
-
+            <div className="flex space-x-2 pb-4">
+              <button
+                className="border-solid border-2 border-black px-2 bg-red-200 rounded-md"
+                onClick={removeMovie}
+              >
+                Remove movie
+              </button>
+              <button
+                className="border-solid border-2 border-black px-2 bg-green-200 rounded-md"
+                onClick={toggleWatched}
+              >
+                {movie.watched ? "Mark as unwatched" : "Mark as watched"}
+              </button>
+            </div>
             <div className="text-sm space-y-2">
               <div>
                 <p>
@@ -112,27 +134,6 @@ export const MovieModal: React.FC<{
                   </ul>
                 </div>
               )}
-            </div>
-
-            <div className="flex space-x-2 pt-4">
-              <button
-                className="border-solid border-2 border-black px-2 bg-gray-200 rounded-md"
-                onClick={() => setIsOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="border-solid border-2 border-black px-2 bg-red-200 rounded-md"
-                onClick={removeMovie}
-              >
-                Remove movie
-              </button>
-              <button
-                className="border-solid border-2 border-black px-2 bg-green-200 rounded-md"
-                onClick={toggleWatched}
-              >
-                {movie.watched ? "Mark as unwatched" : "Mark as watched"}
-              </button>
             </div>
           </div>
         )}

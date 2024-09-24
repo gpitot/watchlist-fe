@@ -44,7 +44,7 @@ const AddMovie: React.FC = () => {
       <input
         type="text"
         className="border-2 p-2 w-[400px] border-black"
-        placeholder="Add a movie to your watchlist"
+        placeholder="Add a movie or show to your watchlist"
         onChange={handleChange}
         value={title}
       />
