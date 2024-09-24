@@ -227,6 +227,32 @@ export type Database = {
           },
         ]
       }
+      user_providers: {
+        Row: {
+          created_at: string
+          id: string
+          provider_name: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          provider_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          provider_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_user_providers_id_fkey"
+            columns: ["id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           created_at: string | null

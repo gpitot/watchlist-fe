@@ -51,8 +51,8 @@ const AddMovie: React.FC = () => {
       <input
         type="submit"
         value={`${isLoading ? "Submitting..." : "Submit"}`}
-        className="border-2 py-2 px-4 cursor-pointer border-black disabled:bg-gray-400"
-        disabled={isLoading}
+        className="border-2 py-2 px-4 cursor-pointer border-black disabled:bg-gray-400 disabled:text-gray-200"
+        disabled={isLoading || title.length === 0}
       />
     </form>
   );

@@ -10,6 +10,7 @@ export type MovieDetailsResponse = {
   production?: string | null;
   watched: boolean;
   rating: number | null;
+  medium: string;
   movies_genres: {
     genre: string | null;
   }[];
@@ -151,6 +152,66 @@ export const useRefreshProviders = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries("movies");
+    },
+  });
+};
+
+export const useGetUserProviders = (userId?: string) => {
+  return useQuery({
+    queryKey: ["providers", userId],
+    enabled: userId !== undefined,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_providers")
+        .select(
+          `
+          provider_name
+          `
+        )
+        .match({ id: userId });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
+  });
+};
+
+export const useUpdateUserProviders = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      providers,
+      providersToDelete,
+    }: {
+      providers: string[];
+      providersToDelete: string[];
+    }) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("Not logged in");
+      }
+
+      if (providersToDelete.length > 0) {
+        await supabase
+          .from("user_providers")
+          .delete()
+          .match({ id: user.id, provider_name: providersToDelete });
+      }
+
+      await supabase.from("user_providers").upsert(
+        providers.map((provider_name) => ({
+          id: user.id,
+          provider_name,
+        }))
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries("providers");
     },
   });
 };

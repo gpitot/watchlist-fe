@@ -3,10 +3,14 @@ import { AddMovie } from "pages/add-movie";
 import { Movies } from "pages/movies";
 import { useUserContext } from "providers/user_provider";
 import { useNavigate, useParams } from "react-router-dom";
-import { useGetMovies } from "api/movies";
-import { useEffect, useMemo, useState } from "react";
-import { Option } from "react-multi-select-component";
+import {
+  useGetMovies,
+  useGetUserProviders,
+  useUpdateUserProviders,
+} from "api/movies";
+import { useEffect, useMemo } from "react";
 import { RefreshProviders } from "pages/refresh_providers";
+import { Option } from "react-multi-select-component";
 
 export const Homepage: React.FC = () => {
   const { user, isLoggedIn, loading } = useUserContext();
@@ -16,9 +20,28 @@ export const Homepage: React.FC = () => {
 
   const { isLoading, isError, data } = useGetMovies(userId ?? user?.id);
 
-  const [selectedProviders, setSelectedProviders] = useState<Option[]>([]);
+  const { data: userProviders } = useGetUserProviders(user?.id);
+  const { mutate } = useUpdateUserProviders();
 
-  const initialProviderOptions = useMemo(() => {
+  const userProviderOptions = (userProviders ?? []).map(
+    ({ provider_name: p }) => ({
+      label: p,
+      value: p,
+    })
+  );
+
+  const handleSelectProviders = (selected: Option[]) => {
+    const previousSelected = userProviderOptions.map((p) => p.value);
+    const currentSelected = selected.map((s) => s.value);
+
+    const providersToDelete = previousSelected.filter(
+      (p) => !currentSelected.includes(p)
+    );
+
+    mutate({ providers: currentSelected, providersToDelete });
+  };
+
+  const allProviderOptions = useMemo(() => {
     const providerSet = new Set<string>();
     data?.movies.map((m) => {
       const providers: string[] = m.movie_providers
@@ -45,9 +68,9 @@ export const Homepage: React.FC = () => {
       <div className="flex flex-col sm:items-center sm:flex-row">
         {userId === undefined && <AddMovie />}
         <MultiSelect
-          selected={selectedProviders}
-          options={initialProviderOptions}
-          setSelected={setSelectedProviders}
+          selected={userProviderOptions}
+          options={allProviderOptions}
+          setSelected={handleSelectProviders}
           label={"Select Providers"}
         />
         <RefreshProviders />
@@ -55,7 +78,7 @@ export const Homepage: React.FC = () => {
 
       <Movies
         movies={data.movies}
-        availableProviders={selectedProviders.map((p) => p.value)}
+        availableProviders={userProviderOptions.map((p) => p.value)}
       />
     </div>
   );
