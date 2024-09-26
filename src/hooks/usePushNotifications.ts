@@ -49,9 +49,19 @@ export const usePushNotifications = (): {
   }
 
   if (!subscription && !error) {
+    console.log(
+      "[g] navigator.serviceWorker.ready",
+      Object.getOwnPropertyNames(Object.getPrototypeOf(navigator.serviceWorker))
+    );
     navigator.serviceWorker.ready
       .then((reg) => {
         setLoading(1);
+
+        console.log(
+          "[g] reg ",
+          Object.values(reg),
+          Object.getOwnPropertyNames(Object.getPrototypeOf(reg))
+        );
 
         reg.pushManager
           .getSubscription()
@@ -82,12 +92,18 @@ export const usePushNotifications = (): {
           })
           .catch((err) => {
             console.log("error getting subscription", err);
-            setError("Error getting subscription");
+            setError(`${parseError(err)} : error getting subscription`);
           });
       })
       .catch((err) => {
         console.log("error getting service worker", err);
-        setError(`${parseError(err)} : Error getting service worker`);
+        setError(
+          `${parseError(
+            err
+          )} : Error getting service worker ${Object.getOwnPropertyNames(
+            Object.getPrototypeOf(navigator.serviceWorker)
+          )}`
+        );
       });
   }
 
