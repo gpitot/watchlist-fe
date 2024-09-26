@@ -24,6 +24,7 @@
       "api": ["api/*"],
       "components": ["components/*"],
       "pages": ["pages/*"],
+      "hooks": ["hooks/*"],
       "assets": ["assets/*"],
       "providers": ["providers/*"],
       "interfaces": ["interfaces/*"]
