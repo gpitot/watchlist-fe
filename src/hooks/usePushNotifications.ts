@@ -1,12 +1,15 @@
 import { useSubscribeToPush } from "api/memories";
 import { useEffect, useState } from "react";
 
-export const usePushNotifications = () => {
+export const usePushNotifications = (): {
+  subscription: PushSubscription | null;
+  error: string | undefined;
+} => {
   const { mutate } = useSubscribeToPush();
   const [subscription, setSubscription] = useState<PushSubscription | null>(
     null
   );
-  const [error, setError] = useState<boolean>(false);
+  const [error, setError] = useState<string | undefined>();
   const [registered, setRegistered] = useState<boolean>(false);
 
   useEffect(() => {
@@ -17,16 +20,19 @@ export const usePushNotifications = () => {
 
   if (!("serviceWorker" in navigator)) {
     console.log("Service workers are not supported");
-    return { subscription };
+    setError("Service workers are not supported");
   }
 
-  if (!registered) {
+  if (!registered && !error) {
     navigator.serviceWorker
       .register("./sw.js", {
         scope: "/",
         type: "module",
       })
-      .catch((err) => console.error("Service worker registration failed", err))
+      .catch((err) => {
+        console.log("error registering service worker", err);
+        setError("Error registering service worker");
+      })
       .finally(() => setRegistered(true));
   }
 
@@ -45,7 +51,7 @@ export const usePushNotifications = () => {
             })
             .catch((err) => {
               console.log("error subscribing ", err);
-              setError(true);
+              setError("Error subscribing to push notifications");
             });
         } else {
           setSubscription(subscription);
@@ -54,5 +60,5 @@ export const usePushNotifications = () => {
     });
   }
 
-  return { subscription };
+  return { subscription, error };
 };
