@@ -32,7 +32,7 @@ export const MemoryBase: React.FC = () => {
       <Outlet />
 
       <AddMemory />
-      {subscription && <div>{`${subscription.toJSON()}`}</div>}
+      {subscription && <div>{`${JSON.stringify(subscription.toJSON())}`}</div>}
       {error && <div>{error}</div>}
       <button
         onClick={pushNotifications}
