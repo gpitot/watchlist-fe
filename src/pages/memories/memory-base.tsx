@@ -37,7 +37,7 @@ export const MemoryBase: React.FC = () => {
       {error && <div>{error}</div>}
       <button
         onClick={pushNotifications}
-        className="border-2 p-4 m-4 border-gray-600"
+        className="border-2 p-4 m-4 border-gray-600 bg-red-700"
       >
         Push!
       </button>

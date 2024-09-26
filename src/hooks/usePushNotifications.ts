@@ -1,6 +1,13 @@
 import { useSubscribeToPush } from "api/memories";
 import { useEffect, useState } from "react";
 
+const parseError = (err: unknown): string => {
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return "Unknown error";
+};
+
 export const usePushNotifications = (): {
   subscription: PushSubscription | null;
   loading: number;
@@ -33,11 +40,7 @@ export const usePushNotifications = (): {
       })
       .catch((err) => {
         console.log("error registering service worker", err);
-        setError(
-          `${
-            err instanceof Error ? err.message : "Unknown error"
-          } : error registering service worker`
-        );
+        setError(`${parseError(err)} : error registering service worker`);
       })
       .finally(() => {
         setLoading(0.5);
@@ -80,7 +83,7 @@ export const usePushNotifications = (): {
       })
       .catch((err) => {
         console.log("error getting service worker", err);
-        setError("Error getting service worker");
+        setError(`${parseError(err)} : Error getting service worker`);
       });
   }
 
