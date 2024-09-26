@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 export const usePushNotifications = (): {
   subscription: PushSubscription | null;
+  loading: number;
   error: string | undefined;
 } => {
   const { mutate } = useSubscribeToPush();
@@ -11,6 +12,7 @@ export const usePushNotifications = (): {
   );
   const [error, setError] = useState<string | undefined>();
   const [registered, setRegistered] = useState<boolean>(false);
+  const [loading, setLoading] = useState<number>(0);
 
   useEffect(() => {
     if (subscription) {
@@ -33,32 +35,50 @@ export const usePushNotifications = (): {
         console.log("error registering service worker", err);
         setError("Error registering service worker");
       })
-      .finally(() => setRegistered(true));
+      .finally(() => {
+        setLoading(0.5);
+        setRegistered(true);
+      });
   }
 
   if (!subscription && !error) {
-    navigator.serviceWorker.ready.then((reg) => {
-      reg.pushManager.getSubscription().then((subscription) => {
-        if (subscription === null) {
-          reg.pushManager
-            .subscribe({
-              userVisibleOnly: true,
-              applicationServerKey:
-                "BGbQfx_iQmO8VrcKNRTUw2blDHGflF_g3S0qjQZtM021eUlHj-GhQsSbqwbit8tF2hy7fi1Gfmq0j5TpRiCF7Zo",
-            })
-            .then((sub) => {
-              setSubscription(sub);
-            })
-            .catch((err) => {
-              console.log("error subscribing ", err);
-              setError("Error subscribing to push notifications");
-            });
-        } else {
-          setSubscription(subscription);
-        }
+    navigator.serviceWorker.ready
+      .then((reg) => {
+        setLoading(1);
+
+        reg.pushManager
+          .getSubscription()
+          .then((subscription) => {
+            setLoading(2);
+            if (subscription === null) {
+              reg.pushManager
+                .subscribe({
+                  userVisibleOnly: true,
+                  applicationServerKey:
+                    "BGbQfx_iQmO8VrcKNRTUw2blDHGflF_g3S0qjQZtM021eUlHj-GhQsSbqwbit8tF2hy7fi1Gfmq0j5TpRiCF7Zo",
+                })
+                .then((sub) => {
+                  setLoading(3);
+                  setSubscription(sub);
+                })
+                .catch((err) => {
+                  console.log("error subscribing ", err);
+                  setError("Error subscribing to push notifications");
+                });
+            } else {
+              setSubscription(subscription);
+            }
+          })
+          .catch((err) => {
+            console.log("error getting subscription", err);
+            setError("Error getting subscription");
+          });
+      })
+      .catch((err) => {
+        console.log("error getting service worker", err);
+        setError("Error getting service worker");
       });
-    });
   }
 
-  return { subscription, error };
+  return { subscription, error, loading };
 };
