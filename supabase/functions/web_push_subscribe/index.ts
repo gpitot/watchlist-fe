@@ -5,7 +5,11 @@ import { Database } from "../_shared/database.types.ts";
 import { z } from "zod";
 
 // Read generated VAPID file.
-const vapidKeysJson = JSON.parse(Deno.readTextFileSync("./vapid.json"));
+const VAPID_KEYS = Deno.env.get("VAPID_KEYS");
+if (!VAPID_KEYS) {
+  throw new Error("VAPID_KEYS is not set");
+}
+const vapidKeysJson = JSON.parse(VAPID_KEYS);
 const vapidKeys = await webpush.importVapidKeys(vapidKeysJson, {
   extractable: false,
 });

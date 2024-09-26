@@ -1,5 +1,5 @@
 import { useSubscribeToPush } from "api/memories";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const usePushNotifications = () => {
   const { mutate } = useSubscribeToPush();
@@ -8,6 +8,12 @@ export const usePushNotifications = () => {
   );
   const [error, setError] = useState<boolean>(false);
   const [registered, setRegistered] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (subscription) {
+      mutate({ subscription: subscription.toJSON() });
+    }
+  }, [subscription]);
 
   if (!("serviceWorker" in navigator)) {
     console.log("Service workers are not supported");
@@ -27,8 +33,6 @@ export const usePushNotifications = () => {
   if (!subscription && !error) {
     navigator.serviceWorker.ready.then((reg) => {
       reg.pushManager.getSubscription().then((subscription) => {
-        setSubscription(subscription);
-
         if (subscription === null) {
           reg.pushManager
             .subscribe({
@@ -38,12 +42,13 @@ export const usePushNotifications = () => {
             })
             .then((sub) => {
               setSubscription(sub);
-              mutate({ subscription: sub.toJSON() });
             })
             .catch((err) => {
               console.log("error subscribing ", err);
               setError(true);
             });
+        } else {
+          setSubscription(subscription);
         }
       });
     });
