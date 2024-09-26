@@ -1,5 +1,8 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import * as webpush from "@negrel/webpush";
+import { createClient } from "supabase";
+import { Database } from "../_shared/database.types.ts";
+import { z } from "zod";
 
 // Read generated VAPID file.
 const vapidKeysJson = JSON.parse(Deno.readTextFileSync("./vapid.json"));
@@ -17,26 +20,55 @@ const appServer = await webpush.ApplicationServer.new({
   vapidKeys,
 });
 
+const adminClient = createClient<Database>(
+  Deno.env.get("SUPABASE_URL") ?? "",
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+);
+
+const Subscription = z.object({
+  endpoint: z.string(),
+  keys: z.object({
+    p256dh: z.string(),
+    auth: z.string(),
+  }),
+});
+type Subscription = z.infer<typeof Subscription>;
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  // Retrieve subscription.
-  const subscription = await req.json();
-  // You can store it in a DB to reuse it later.
-  // ...
+  try {
+    const { data, error } = await adminClient
+      .from("user_push_subscriptions")
+      .select("*");
+    if (error) {
+      throw error;
+    }
 
-  // Create a subscriber object.
-  const subscriber = appServer.subscribe(subscription);
+    for (const subscriptionRecord of data ?? []) {
+      const subscription = Subscription.parse({
+        endpoint: subscriptionRecord.endpoint,
+        keys: subscriptionRecord.keys,
+      });
 
-  // Send notification.
-  await subscriber.pushTextMessage(
-    JSON.stringify({ title: "Hello from application server!" }),
-    {}
-  );
+      // Create a subscriber object.
+      const subscriber = appServer.subscribe(subscription);
 
-  return new Response(JSON.stringify({}), {
-    headers: { "Content-Type": "application/json", ...corsHeaders },
-  });
+      // Send notification.
+      await subscriber.pushTextMessage(
+        JSON.stringify({ title: "Hello from application server!" }),
+        {}
+      );
+    }
+
+    return new Response(JSON.stringify({}), {
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "An error occurred";
+    console.error(err);
+    return new Response(message, { status: 500, headers: corsHeaders });
+  }
 });

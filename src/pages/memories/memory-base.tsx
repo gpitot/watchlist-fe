@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 export const MemoryBase: React.FC = () => {
   const { subscription } = usePushNotifications();
-  console.log("[g] subscription ", subscription);
+  console.log("[g] subscription ", subscription?.toJSON());
   return (
     <article>
       <Outlet />

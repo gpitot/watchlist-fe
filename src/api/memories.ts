@@ -27,16 +27,26 @@ export const useAddMemory = () => {
 };
 
 export const useSubscribeToPush = () => {
-  // return useMutation(
-  //   async ({ subscription }: { subscription: PushSubscription }) => {
-  //     const { error } = await supabase.from("user_push_subscriptions").insert({
-  //       endpoint: subscription.endpoint,
-  //       p256dh: subscription.keys.p256dh,
-  //       auth: subscription.keys.auth,
-  //     });
-  //     if (error) {
-  //       throw error;
-  //     }
-  //   }
-  // );
+  return useMutation(
+    async ({ subscription }: { subscription: PushSubscriptionJSON }) => {
+      if (!subscription.endpoint) {
+        throw new Error("Invalid subscription: missing endpoint");
+      }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("Not logged in");
+      }
+      console.log("[g] saving to db: subscription ", subscription);
+      const { error } = await supabase.from("user_push_subscriptions").upsert({
+        user_id: user.id,
+        endpoint: subscription.endpoint,
+        keys: subscription.keys,
+      });
+      if (error) {
+        throw error;
+      }
+    }
+  );
 };

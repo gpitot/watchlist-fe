@@ -110,7 +110,8 @@ Deno.serve(async (req) => {
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (err) {
+    const message = err instanceof Error ? err.message : "An error occurred";
     console.error(err);
-    return new Response(err.message, { status: 500, headers: corsHeaders });
+    return new Response(message, { status: 500, headers: corsHeaders });
   }
 });

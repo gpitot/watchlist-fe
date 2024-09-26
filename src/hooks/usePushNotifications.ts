@@ -1,6 +1,8 @@
+import { useSubscribeToPush } from "api/memories";
 import { useState } from "react";
 
 export const usePushNotifications = () => {
+  const { mutate } = useSubscribeToPush();
   const [subscription, setSubscription] = useState<PushSubscription | null>(
     null
   );
@@ -36,6 +38,7 @@ export const usePushNotifications = () => {
             })
             .then((sub) => {
               setSubscription(sub);
+              mutate({ subscription: sub.toJSON() });
             })
             .catch((err) => {
               console.log("error subscribing ", err);
