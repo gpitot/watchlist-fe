@@ -227,6 +227,38 @@ export type Database = {
           },
         ]
       }
+      user_memories: {
+        Row: {
+          answer: string
+          created_at: string
+          id: number
+          memory: string | null
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: number
+          memory?: string | null
+          user_id?: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: number
+          memory?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_memories_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_providers: {
         Row: {
           created_at: string

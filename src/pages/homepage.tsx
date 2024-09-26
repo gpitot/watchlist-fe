@@ -2,7 +2,7 @@ import { MultiSelect } from "components/multi_select";
 import { AddMovie } from "pages/add-movie";
 import { Movies } from "pages/movies";
 import { useUserContext } from "providers/user_provider";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   useGetMovies,
   useGetUserProviders,
@@ -15,6 +15,20 @@ import { Option } from "react-multi-select-component";
 export const Homepage: React.FC = () => {
   const { user, isLoggedIn, loading } = useUserContext();
   const { userId } = useParams();
+
+  const copyShareLink = async () => {
+    if (!user) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(
+        `${window.location.origin}/watchlist/share/${user.id}`
+      );
+      alert("Copied to clipboard!");
+    } catch (e) {
+      alert("Could not copy to clipboard.");
+    }
+  };
 
   const navigate = useNavigate();
 
@@ -64,22 +78,35 @@ export const Homepage: React.FC = () => {
   if (isError || !data) return <h1>Error</h1>;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:items-center sm:flex-row">
-        {userId === undefined && <AddMovie />}
-        <MultiSelect
-          selected={userProviderOptions}
-          options={allProviderOptions}
-          setSelected={handleSelectProviders}
-          label={"Select Providers"}
-        />
-        <RefreshProviders />
-      </div>
+    <>
+      <header className="p-4 py-8  bg-green-800 text-white  flex justify-between align-middle">
+        <Link to="/">
+          <h1 className="text-2xl">Watchlist</h1>
+        </Link>
 
-      <Movies
-        movies={data.movies}
-        availableProviders={userProviderOptions.map((p) => p.value)}
-      />
-    </div>
+        {isLoggedIn && (
+          <button className="text-md underline" onClick={copyShareLink}>
+            Share your watchlist
+          </button>
+        )}
+      </header>
+      <div className="space-y-4">
+        <div className="flex flex-col sm:items-center sm:flex-row">
+          {userId === undefined && <AddMovie />}
+          <MultiSelect
+            selected={userProviderOptions}
+            options={allProviderOptions}
+            setSelected={handleSelectProviders}
+            label={"Select Providers"}
+          />
+          <RefreshProviders />
+        </div>
+
+        <Movies
+          movies={data.movies}
+          availableProviders={userProviderOptions.map((p) => p.value)}
+        />
+      </div>
+    </>
   );
 };
