@@ -70,7 +70,11 @@ export const usePushNotifications = (): {
                 })
                 .catch((err) => {
                   console.log("error subscribing ", err);
-                  setError("Error subscribing to push notifications");
+                  setError(
+                    `${parseError(
+                      err
+                    )} : Error subscribing to push notifications`
+                  );
                 });
             } else {
               setSubscription(subscription);
