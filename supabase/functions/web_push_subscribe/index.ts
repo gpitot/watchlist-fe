@@ -61,6 +61,7 @@ Deno.serve(async (req) => {
       const subscriber = appServer.subscribe(subscription);
 
       // Send notification.
+      console.log("sending notification to ", subscriptionRecord.endpoint);
       await subscriber.pushTextMessage(
         JSON.stringify({ title: "Hello from application server!" }),
         {}
