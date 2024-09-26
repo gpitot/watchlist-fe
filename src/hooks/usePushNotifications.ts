@@ -33,7 +33,11 @@ export const usePushNotifications = (): {
       })
       .catch((err) => {
         console.log("error registering service worker", err);
-        setError("Error registering service worker");
+        setError(
+          `${
+            err instanceof Error ? err.message : "Unknown error"
+          } : error registering service worker`
+        );
       })
       .finally(() => {
         setLoading(0.5);
