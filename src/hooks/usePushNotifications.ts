@@ -63,6 +63,10 @@ export const usePushNotifications = (): {
           Object.getOwnPropertyNames(Object.getPrototypeOf(reg))
         );
 
+        setError(
+          `reg : ${Object.getOwnPropertyNames(Object.getPrototypeOf(reg))}`
+        );
+
         reg.pushManager
           .getSubscription()
           .then((subscription) => {
@@ -97,13 +101,13 @@ export const usePushNotifications = (): {
       })
       .catch((err) => {
         console.log("error getting service worker", err);
-        setError(
-          `${parseError(
-            err
-          )} : Error getting service worker ${Object.getOwnPropertyNames(
-            Object.getPrototypeOf(navigator.serviceWorker)
-          )}`
-        );
+        // setError(
+        //   `${parseError(
+        //     err
+        //   )} : Error getting service worker ${Object.getOwnPropertyNames(
+        //     Object.getPrototypeOf(navigator.serviceWorker)
+        //   )}`
+        // );
       });
   }
 
