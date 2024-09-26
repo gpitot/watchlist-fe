@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 export const MemoryBase: React.FC = () => {
-  const { error } = usePushNotifications();
+  const { error, subscription } = usePushNotifications();
   const { isLoggedIn, loading } = useUserContext();
   const navigate = useNavigate();
 
@@ -32,6 +32,7 @@ export const MemoryBase: React.FC = () => {
       <Outlet />
 
       <AddMemory />
+      {subscription && <div>{`${subscription.toJSON()}`}</div>}
       {error && <div>{error}</div>}
       <button
         onClick={pushNotifications}
