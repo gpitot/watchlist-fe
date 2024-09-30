@@ -141,11 +141,13 @@ const TableUI: React.FC<{
               const hasFreeProviders = movie.movie_providers.some((p) =>
                 availableProviders.includes(p.provider_name ?? "")
               );
+
               return (
                 <tr
                   key={movie.id}
                   className={classNames({
-                    "bg-green-300": hasFreeProviders,
+                    "bg-gray-200": !hasFreeProviders,
+                    "bg-green-200": movie.watched,
                   })}
                   data-movieid={movie.id}
                 >
