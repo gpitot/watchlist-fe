@@ -49,6 +49,9 @@ export const MovieModal: React.FC<{
   const cast = movie?.movie_credits.filter((r) => r.role === "cast") ?? [];
   const crew = movie?.movie_credits.filter((r) => r.role === "crew") ?? [];
 
+  const providers =
+    movie?.movie_providers.filter((p) => p.provider_type === "free") ?? [];
+
   return (
     <div
       className={classNames({
@@ -58,7 +61,20 @@ export const MovieModal: React.FC<{
     >
       <dialog
         open={isOpen}
-        className=" relative mx-auto my-10 p-4 rounded-md border-solid border-black border-2 max-w-lg max-h-96 overflow-auto"
+        className={`
+          md:relative
+          md:my-10
+          
+          fixed 
+          mx-auto 
+          bottom-0 
+          p-4 
+          rounded-md 
+          border-solid 
+          border-black 
+          border-2 
+          max-w-lg h-4/5
+          overflow-auto`}
         onClick={(e) => e.stopPropagation()}
       >
         {movie && (
@@ -76,33 +92,20 @@ export const MovieModal: React.FC<{
             <p className="text-sm">{movie.description}</p>
 
             <Stars rating={rating} handleClick={updateRating} />
-            <div className="flex space-x-2 pb-4">
-              <button
-                className="border-solid border-2 border-black px-2 bg-red-200 rounded-md"
-                onClick={removeMovie}
-              >
-                Remove movie
-              </button>
-              <button
-                className="border-solid border-2 border-black px-2 bg-green-200 rounded-md"
-                onClick={toggleWatched}
-              >
-                {movie.watched ? "Mark as unwatched" : "Mark as watched"}
-              </button>
-            </div>
+
             <div className="text-sm space-y-2">
               <div>
-                <p>
-                  <span className="font-bold">Produced by: </span>
-                  {movie.production}
-                </p>
+                <p className="font-bold">Produced by</p>
+                <ul className="font-extralight text-xs">
+                  <li>{movie.production}</li>
+                </ul>
               </div>
 
-              {movie.movie_providers.length > 0 && (
+              {providers.length > 0 && (
                 <div>
                   <p className="font-bold">Providers</p>
                   <ul className="font-extralight text-xs">
-                    {movie.movie_providers.map((provider) => (
+                    {providers.map((provider) => (
                       <li key={provider.provider_name}>
                         {provider.provider_name}
                       </li>
@@ -134,6 +137,21 @@ export const MovieModal: React.FC<{
                   </ul>
                 </div>
               )}
+            </div>
+
+            <div className="flex space-x-4 py-4 w-full">
+              <button
+                className="border-solid border-2 border-black p-2 bg-red-200 rounded-md flex-grow"
+                onClick={removeMovie}
+              >
+                Remove movie
+              </button>
+              <button
+                className="border-solid border-2 border-black p-2 bg-green-200 rounded-md flex-grow"
+                onClick={toggleWatched}
+              >
+                {movie.watched ? "Mark as unwatched" : "Mark as watched"}
+              </button>
             </div>
           </div>
         )}

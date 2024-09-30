@@ -1,173 +1,124 @@
 import classNames from "classnames";
 
-import {
-  Column,
-  Table,
-  useReactTable,
-  ColumnFiltersState,
-  getCoreRowModel,
-  getFilteredRowModel,
-  flexRender,
-  createColumnHelper,
-  getSortedRowModel,
-  SortingState,
-  RowSelectionState,
-} from "@tanstack/react-table";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MovieDetailsResponse } from "api/movies";
 import { MovieModal } from "pages/movie-modal";
-import { Stars } from "components/stars";
 
-// A debounced input react component
-function DebouncedInput({
-  value: initialValue,
-  onChange,
-  debounce = 500,
-  ...props
-}: {
-  value: string | number;
-  onChange: (value: string | number) => void;
-  debounce?: number;
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">) {
-  const [value, setValue] = useState(initialValue);
+const columns: [
+  string,
+  {
+    dataType: keyof MovieDetailsResponse;
+    render: React.FC<MovieDetailsResponse>;
+  }
+][] = [
+  [
+    "Title",
+    {
+      dataType: "title",
+      render: ({ title }) => <>{title}</>,
+    },
+  ],
 
-  useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
+  // [
+  //   "Rating",
+  //   {
+  //     dataType: "rating",
+  //     render: ({ rating }) => <>{rating}</>,
+  //   },
+  // ],
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      onChange(value);
-    }, debounce);
+  [
+    "Genres",
+    {
+      dataType: "movies_genres",
+      render: ({ movies_genres }) => (
+        <>{movies_genres.map((genre) => genre.genre).join(", ")}</>
+      ),
+    },
+  ],
 
-    return () => clearTimeout(timeout);
-  }, [value]);
+  // [
+  //   "Providers",
+  //   {
+  //     dataType: "movie_providers",
+  //     render: ({ movie_providers }) => (
+  //       <>
+  //         {movie_providers
+  //           .filter((provider) => provider.provider_type === "free")
+  //           .map((provider) => provider.provider_name)
+  //           .join(", ")}
+  //       </>
+  //     ),
+  //   },
+  // ],
 
-  return (
-    <input
-      {...props}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-    />
-  );
-}
-function Filter({
-  column,
-}: {
-  column: Column<MovieDetailsResponse, unknown>;
-  table: Table<MovieDetailsResponse>;
-}) {
-  const columnFilterValue = column.getFilterValue();
-  return (
-    <DebouncedInput
-      type="text"
-      value={(columnFilterValue ?? "") as string}
-      onChange={(value) => column.setFilterValue(value)}
-      placeholder={`Search... (${column.getFacetedUniqueValues().size})`}
-      className="w-36 border shadow rounded"
-      list={column.id + "list"}
-    />
-  );
-}
-const columnHelper = createColumnHelper<MovieDetailsResponse>();
+  // [
+  //   "Description",
+  //   {
+  //     dataType: "description",
+  //     render: ({ description }) => <>{description?.slice(0, 20)}</>,
+  //   },
+  // ],
+
+  // [
+  //   "Production",
+  //   {
+  //     dataType: "production",
+  //     render: ({ production }) => <>{production}</>,
+  //   },
+  // ],
+
+  [
+    "Release",
+    {
+      dataType: "release_date",
+      render: ({ release_date }) => <>{release_date}</>,
+    },
+  ],
+
+  // [
+  //   "Watched",
+  //   {
+  //     dataType: "watched",
+  //     render: ({ watched }) => <>{watched ? "Yes" : "No"}</>,
+  //   },
+  // ],
+] as const;
+
+const findParentRow = (el: HTMLElement): HTMLElement | null => {
+  if (el.tagName === "TR") {
+    return el;
+  }
+
+  if (el.parentElement) {
+    return findParentRow(el.parentElement);
+  }
+  return null;
+};
 
 const TableUI: React.FC<{
   data: MovieDetailsResponse[];
   availableProviders: string[];
 }> = ({ data, availableProviders }) => {
-  const columns = [
-    columnHelper.accessor("title", {
-      header: "Title",
-      enableSorting: false,
-    }),
-
-    columnHelper.accessor("movies_genres", {
-      header: "Genres",
-      enableColumnFilter: false,
-      enableSorting: false,
-      cell: (genres) =>
-        genres
-          .getValue()
-          .map((g) => g.genre)
-          .join(", "),
-    }),
-    columnHelper.accessor("movie_providers", {
-      header: "Providers",
-      enableColumnFilter: false,
-      enableSorting: false,
-      cell: (providers) =>
-        providers
-          .getValue()
-          .filter((p) => p.provider_type === "free")
-          .map((p) => p.provider_name)
-          .join(", "),
-    }),
-
-    columnHelper.accessor("description", {
-      header: "Description",
-      enableColumnFilter: false,
-      enableSorting: false,
-      cell: (desc) => `${desc.getValue()?.slice(0, 200)}...`,
-    }),
-
-    columnHelper.accessor("release_date", {
-      header: "Release Date",
-      enableColumnFilter: false,
-      cell: (date) => date.getValue()?.slice(0, 10),
-      sortDescFirst: true,
-      enableSorting: true,
-    }),
-
-    columnHelper.accessor("watched", {
-      header: "Watched",
-      enableColumnFilter: false,
-      enableSorting: true,
-      cell: (watched) => (watched.getValue() ? "✅" : ""),
-    }),
-    columnHelper.accessor("rating", {
-      header: "Rating",
-      enableColumnFilter: false,
-      enableSorting: true,
-      cell: (rating) => <Stars rating={rating.getValue() ?? 0} />,
-      minSize: 1050,
-      size: 500,
-    }),
-  ];
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [currentMovie, setCurrentMovie] = useState<MovieDetailsResponse>();
 
-  useEffect(() => {
-    if (rowSelection !== undefined) {
-      const rowsSelected = Object.keys(rowSelection);
-      if (rowsSelected.length > 0) {
-        const index = Number(rowsSelected[0]);
-        setCurrentMovie(data[index]);
-        setModalIsOpen(true);
-      }
+  const handleClick = (e: React.MouseEvent<HTMLTableSectionElement>) => {
+    if (!(e.target instanceof HTMLElement)) {
+      return;
     }
-  }, [rowSelection]);
+    const row = findParentRow(e.target);
+    if (!row) {
+      return;
+    }
+    const movieId = row.getAttribute("data-movieid");
+    if (!movieId) {
+      throw new Error("Movie ID not found");
+    }
+    setCurrentMovie(data.find((m) => m.id === Number(movieId)));
+    setModalIsOpen(true);
+  };
 
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      columnFilters,
-      sorting,
-      rowSelection, //pass the row selection state back to the table instance
-    },
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    debugTable: true,
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onRowSelectionChange: setRowSelection,
-    enableMultiRowSelection: false,
-  });
   return (
     <>
       <MovieModal
@@ -176,63 +127,31 @@ const TableUI: React.FC<{
         movie={currentMovie}
       />
       <div className="relative w-screen overflow-x-auto">
-        <table>
+        <table className="w-full">
           <thead>
-            {table.getHeaderGroups().map((headers) => (
-              <tr key={headers.id}>
-                {headers.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    {...{
-                      className: classNames({
-                        "cursor-pointer": header.column.getCanSort(),
-                      }),
-                      onClick: header.column.getToggleSortingHandler(),
-                    }}
-                  >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                    {header.column.getCanFilter() ? (
-                      <div>
-                        <Filter column={header.column} table={table} />
-                      </div>
-                    ) : null}
-                    {{
-                      asc: " 🔼",
-                      desc: " 🔽",
-                    }[header.column.getIsSorted() as string] ?? null}
-                  </th>
-                ))}
-              </tr>
-            ))}
+            <tr>
+              {columns.map(([header]) => (
+                <th key={header}>{header}</th>
+              ))}
+            </tr>
           </thead>
 
-          <tbody>
-            {table.getRowModel().rows.map((row) => {
-              const hasFreeProviders = row
-                .getValue<MovieDetailsResponse["movie_providers"]>(
-                  "movie_providers"
-                )
-                .some((p) =>
-                  availableProviders.includes(p.provider_name ?? "")
-                );
-
+          <tbody onClick={handleClick}>
+            {data.map((movie) => {
+              const hasFreeProviders = movie.movie_providers.some((p) =>
+                availableProviders.includes(p.provider_name ?? "")
+              );
               return (
                 <tr
-                  key={row.id}
+                  key={movie.id}
                   className={classNames({
                     "bg-green-300": hasFreeProviders,
                   })}
-                  onClick={row.getToggleSelectedHandler()}
+                  data-movieid={movie.id}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="p-1">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                  {columns.map(([column, config]) => (
+                    <td key={column} className="p-1">
+                      {config.render(movie)}
                     </td>
                   ))}
                 </tr>
