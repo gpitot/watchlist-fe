@@ -4,6 +4,8 @@ import { useState } from "react";
 export const AddMemory: React.FC = () => {
   const { mutate } = useAddMemory();
 
+  const [show, setShow] = useState(false);
+
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
 
@@ -20,6 +22,17 @@ export const AddMemory: React.FC = () => {
     setQuestion("");
     setAnswer("");
   };
+
+  if (!show) {
+    return (
+      <button
+        onClick={() => setShow(true)}
+        className="border-2 py-2 px-4 cursor-pointer border-black disabled:bg-gray-400 disabled:text-gray-200"
+      >
+        Add memory
+      </button>
+    );
+  }
 
   return (
     <div className="flex flex-col space-y-2 p-4 justify-center w-[400px]">

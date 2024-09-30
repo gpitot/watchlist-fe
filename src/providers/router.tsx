@@ -3,6 +3,7 @@ import { Base } from "pages/Base";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Homepage } from "pages/homepage";
 import { MemoryBase } from "pages/memories/memory-base";
+import { ViewMemory } from "pages/memories/view-memory";
 
 const router = createBrowserRouter([
   {
@@ -25,7 +26,12 @@ const router = createBrowserRouter([
   {
     path: "/memories",
     element: <MemoryBase />,
-    children: [],
+    children: [
+      {
+        path: "/memories/:memoryId",
+        element: <ViewMemory />,
+      },
+    ],
   },
 ]);
 

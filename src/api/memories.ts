@@ -1,5 +1,5 @@
 import { supabase } from "api/database";
-import { useMutation } from "react-query";
+import { useMutation, useQuery } from "react-query";
 
 export const useAddMemory = () => {
   return useMutation(
@@ -24,6 +24,29 @@ export const useAddMemory = () => {
       }
     }
   );
+};
+
+export const useGetMemory = (memoryId: number) => {
+  return useQuery({
+    queryKey: ["memory", memoryId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_memories")
+        .select(
+          `
+          memory,answer
+          `
+        )
+        .match({ id: memoryId })
+        .single();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
+  });
 };
 
 export const useSubscribeToPush = () => {

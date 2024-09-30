@@ -10,7 +10,6 @@ const parseError = (err: unknown): string => {
 
 export const usePushNotifications = (): {
   subscription: PushSubscription | null;
-  loading: number;
   error: string | undefined;
 } => {
   const { mutate } = useSubscribeToPush();
@@ -19,7 +18,6 @@ export const usePushNotifications = (): {
   );
   const [error, setError] = useState<string | undefined>();
   const [registered, setRegistered] = useState<boolean>(false);
-  const [loading, setLoading] = useState<number>(0);
 
   useEffect(() => {
     if (subscription) {
@@ -34,7 +32,7 @@ export const usePushNotifications = (): {
 
   if (!registered && !error) {
     navigator.serviceWorker
-      .register("./sw.js", {
+      .register("/sw.js", {
         scope: "/",
         type: "module",
       })
@@ -43,7 +41,6 @@ export const usePushNotifications = (): {
         setError(`${parseError(err)} : error registering service worker`);
       })
       .finally(() => {
-        setLoading(0.5);
         setRegistered(true);
       });
   }
@@ -55,22 +52,9 @@ export const usePushNotifications = (): {
     );
     navigator.serviceWorker.ready
       .then((reg) => {
-        setLoading(1);
-
-        console.log(
-          "[g] reg ",
-          Object.values(reg),
-          Object.getOwnPropertyNames(Object.getPrototypeOf(reg))
-        );
-
-        setError(
-          `reg : ${Object.getOwnPropertyNames(Object.getPrototypeOf(reg))}`
-        );
-
         reg.pushManager
           .getSubscription()
           .then((subscription) => {
-            setLoading(2);
             if (subscription === null) {
               reg.pushManager
                 .subscribe({
@@ -79,7 +63,6 @@ export const usePushNotifications = (): {
                     "BGbQfx_iQmO8VrcKNRTUw2blDHGflF_g3S0qjQZtM021eUlHj-GhQsSbqwbit8tF2hy7fi1Gfmq0j5TpRiCF7Zo",
                 })
                 .then((sub) => {
-                  setLoading(3);
                   setSubscription(sub);
                 })
                 .catch((err) => {
@@ -101,15 +84,9 @@ export const usePushNotifications = (): {
       })
       .catch((err) => {
         console.log("error getting service worker", err);
-        // setError(
-        //   `${parseError(
-        //     err
-        //   )} : Error getting service worker ${Object.getOwnPropertyNames(
-        //     Object.getPrototypeOf(navigator.serviceWorker)
-        //   )}`
-        // );
+        setError(`${parseError(err)} : Error getting service worker `);
       });
   }
 
-  return { subscription, error, loading };
+  return { subscription, error };
 };
