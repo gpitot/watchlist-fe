@@ -23,28 +23,11 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
   try {
-    const authHeader = req.headers.get("Authorization")!;
-    const anonClient = createClient<Database>(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const {
-      data: { user },
-    } = await anonClient.auth.getUser();
-
-    if (!user) {
-      return new Response("Unauthorized", {
-        status: 401,
-        headers: corsHeaders,
-      });
-    }
-
-    const { data } = await anonClient
+    const { data } = await adminClient
       .from("movies_users")
-      .select("movie_id, movies(medium, movie_db_id, providers_refreshed_date)")
-      .match({ user_id: user.id });
+      .select(
+        "movie_id, movies(medium, movie_db_id, providers_refreshed_date)"
+      );
 
     for (const movie of data ?? []) {
       const movieId = movie.movie_id;
@@ -67,6 +50,7 @@ Deno.serve(async (req) => {
         console.log("Skipping refresh of movie", movieId);
         continue;
       }
+      console.log("Refreshing movie", movieId);
 
       const updatedProviders = await movieService.getProviders(
         movieDBId,
@@ -84,7 +68,7 @@ Deno.serve(async (req) => {
         }
       }
 
-      const { error } = await anonClient.from("movie_providers").insert(
+      const { error } = await adminClient.from("movie_providers").insert(
         updatedProviders.map((provider) => ({
           movie_id: movieId,
           provider_name: provider.name,
