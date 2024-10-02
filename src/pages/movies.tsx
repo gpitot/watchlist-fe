@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { useState } from "react";
 import { MovieDetailsResponse } from "api/movies";
 import { MovieModal } from "pages/movie-modal";
+import { Stars } from "components/stars";
 
 const columns: [
   string,
@@ -15,17 +16,14 @@ const columns: [
     "Title",
     {
       dataType: "title",
-      render: ({ title }) => <>{title}</>,
+      render: ({ title, rating }) => (
+        <>
+          <span>{title}</span>
+          {rating && <Stars rating={rating} size="sm" />}
+        </>
+      ),
     },
   ],
-
-  // [
-  //   "Rating",
-  //   {
-  //     dataType: "rating",
-  //     render: ({ rating }) => <>{rating}</>,
-  //   },
-  // ],
 
   [
     "Genres",
@@ -37,37 +35,6 @@ const columns: [
     },
   ],
 
-  // [
-  //   "Providers",
-  //   {
-  //     dataType: "movie_providers",
-  //     render: ({ movie_providers }) => (
-  //       <>
-  //         {movie_providers
-  //           .filter((provider) => provider.provider_type === "free")
-  //           .map((provider) => provider.provider_name)
-  //           .join(", ")}
-  //       </>
-  //     ),
-  //   },
-  // ],
-
-  // [
-  //   "Description",
-  //   {
-  //     dataType: "description",
-  //     render: ({ description }) => <>{description?.slice(0, 20)}</>,
-  //   },
-  // ],
-
-  // [
-  //   "Production",
-  //   {
-  //     dataType: "production",
-  //     render: ({ production }) => <>{production}</>,
-  //   },
-  // ],
-
   [
     "Release",
     {
@@ -75,14 +42,6 @@ const columns: [
       render: ({ release_date }) => <>{release_date}</>,
     },
   ],
-
-  // [
-  //   "Watched",
-  //   {
-  //     dataType: "watched",
-  //     render: ({ watched }) => <>{watched ? "Yes" : "No"}</>,
-  //   },
-  // ],
 ] as const;
 
 const findParentRow = (el: HTMLElement): HTMLElement | null => {
@@ -94,6 +53,26 @@ const findParentRow = (el: HTMLElement): HTMLElement | null => {
     return findParentRow(el.parentElement);
   }
   return null;
+};
+
+type MovieState = "watched" | "available" | "unavailable";
+const getMovieState = (
+  movie: MovieDetailsResponse,
+  availableProviders: string[]
+): MovieState => {
+  if (movie.watched) {
+    return "watched";
+  }
+
+  const hasFreeProviders = movie.movie_providers.some((p) =>
+    availableProviders.includes(p.provider_name ?? "")
+  );
+
+  if (hasFreeProviders) {
+    return "available";
+  }
+
+  return "unavailable";
 };
 
 const TableUI: React.FC<{
@@ -138,16 +117,15 @@ const TableUI: React.FC<{
 
           <tbody onClick={handleClick}>
             {data.map((movie) => {
-              const hasFreeProviders = movie.movie_providers.some((p) =>
-                availableProviders.includes(p.provider_name ?? "")
-              );
+              const movieState = getMovieState(movie, availableProviders);
 
               return (
                 <tr
                   key={movie.id}
                   className={classNames({
-                    "bg-gray-200": !hasFreeProviders,
-                    "bg-green-200": movie.watched,
+                    "bg-gray-100": movieState === "unavailable",
+                    "bg-green-100": movieState === "available",
+                    "bg-pink-100": movieState === "watched",
                   })}
                   data-movieid={movie.id}
                 >

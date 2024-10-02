@@ -3,7 +3,8 @@ import classNames from "classnames";
 export const Stars: React.FC<{
   handleClick?: (rating: number) => void;
   rating: number;
-}> = ({ rating, handleClick }) => {
+  size?: "sm" | "md" | "lg";
+}> = ({ rating, handleClick, size = "lg" }) => {
   return (
     <div>
       {Array(5)
@@ -19,7 +20,12 @@ export const Stars: React.FC<{
                   "text-yellow-500": isFilled,
                   "text-gray-500": !isFilled,
                 },
-                "cursor-pointer text-3xl hover:text-yellow-500"
+                {
+                  "text-3xl": size === "lg",
+                  "text-2xl": size === "md",
+                  "text-xl": size === "sm",
+                },
+                "cursor-pointer hover:text-yellow-500"
               )}
             >
               {isFilled ? "★" : "☆"}
