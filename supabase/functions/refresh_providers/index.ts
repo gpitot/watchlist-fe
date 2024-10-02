@@ -23,19 +23,22 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
   try {
-    const { data } = await adminClient
-      .from("movies_users")
-      .select(
-        "movie_id, movies(medium, movie_db_id, providers_refreshed_date)"
-      );
+    const { data, error } = await adminClient.from("movies").select(
+      `id, medium, movie_db_id, providers_refreshed_date 
+        ,movie_providers(provider_name, provider_type)`
+    );
+
+    if (error) {
+      throw error;
+    }
 
     for (const movie of data ?? []) {
-      const movieId = movie.movie_id;
+      const movieId = movie.id;
       const {
         movie_db_id: movieDBId,
         medium,
         providers_refreshed_date,
-      } = movie.movies ?? {};
+      } = movie ?? {};
 
       if (
         !movieDBId ||
@@ -57,19 +60,45 @@ Deno.serve(async (req) => {
         medium
       );
 
-      if (updatedProviders.length > 0) {
-        // adminClient to delete
-        const { error } = await adminClient
-          .from("movie_providers")
-          .delete()
-          .match({ movie_id: movieId });
-        if (error) {
-          throw error;
-        }
+      // providers to remove
+      const providersToRemove = movie.movie_providers.filter(
+        (provider) =>
+          !updatedProviders.some(
+            (updatedProvider) =>
+              updatedProvider.name === provider.provider_name &&
+              updatedProvider.type === provider.provider_type
+          )
+      );
+
+      console.log("providersToRemove", providersToRemove);
+
+      // providers to add
+      const providersToAdd = updatedProviders.filter(
+        (provider) =>
+          !movie.movie_providers.some(
+            (movieProvider) =>
+              movieProvider.provider_name === provider.name &&
+              movieProvider.provider_type === provider.type
+          )
+      );
+
+      console.log("providersToAdd", providersToAdd);
+
+      const removeProvidersPromise = await Promise.all(
+        providersToRemove.map((provider) => {
+          return adminClient.from("movie_providers").delete().match({
+            movie_id: movieId,
+            provider_name: provider.provider_name,
+            provider_type: provider.provider_type,
+          });
+        })
+      );
+      if (removeProvidersPromise.some((p) => p.error)) {
+        throw removeProvidersPromise.find((p) => p.error)?.error;
       }
 
       const { error } = await adminClient.from("movie_providers").insert(
-        updatedProviders.map((provider) => ({
+        providersToAdd.map((provider) => ({
           movie_id: movieId,
           provider_name: provider.name,
           provider_type: provider.type,
