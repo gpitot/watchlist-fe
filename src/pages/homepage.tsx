@@ -9,7 +9,6 @@ import {
   useUpdateUserProviders,
 } from "api/movies";
 import { useEffect, useMemo } from "react";
-import { RefreshProviders } from "pages/refresh_providers";
 import { Option } from "react-multi-select-component";
 
 export const Homepage: React.FC = () => {
@@ -99,7 +98,6 @@ export const Homepage: React.FC = () => {
             setSelected={handleSelectProviders}
             label={"Select Providers"}
           />
-          <RefreshProviders />
         </div>
 
         <Movies
