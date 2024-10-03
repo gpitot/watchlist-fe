@@ -340,7 +340,16 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      available_streams: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          provider_name: string | null
+          provider_type: string | null
+          title: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
