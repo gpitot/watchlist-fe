@@ -13,6 +13,7 @@
     "db:types": "supabase gen types typescript --project-id ambmualoussdnneksprb > src/interfaces/database.types.ts && supabase gen types typescript --project-id ambmualoussdnneksprb > supabase/functions/_shared/database.types.ts"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.3",
     "@supabase/auth-ui-react": "^0.4.6",
     "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/supabase-js": "2.45.4",
