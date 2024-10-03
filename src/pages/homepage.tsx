@@ -78,7 +78,7 @@ export const Homepage: React.FC = () => {
 
   return (
     <>
-      <header className="p-4 py-8  bg-green-800 text-white  flex justify-between align-middle">
+      <header className="p-4 py-8 bg-cover bg-[url('https://img.freepik.com/free-vector/cinema-film-festival-movie-poster-background_1017-33461.jpg')] text-white  flex justify-between align-middle bg-url">
         <Link to="/">
           <h1 className="text-2xl">Watchlist</h1>
         </Link>

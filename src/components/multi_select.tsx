@@ -15,7 +15,7 @@ export const MultiSelect: React.FC<{
       value={selected}
       onChange={setSelected}
       labelledBy={label}
-      className="w-64 p-4"
+      className="md:w-96 w-full md:p-4 pt-2"
     />
   );
 };

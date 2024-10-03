@@ -40,24 +40,33 @@ const Results: React.FC<{
   }
   const hasMovies = data.movies.length > 0;
   const hasTvs = data.tvs.length > 0;
-  if (!hasMovies && !hasTvs) {
-    return null;
-  }
 
   return (
-    <div className="flex flex-col absolute z-10 top-10 border-black border-4">
-      {hasMovies && (
-        <h2 className="text-sm font-bold border-b-2 bg-blue-100 p-2">Movies</h2>
-      )}
-      {data.movies.map((item) => (
-        <Result item={item} handleAdd={handleAdd} />
-      ))}
-      {hasTvs && (
-        <h2 className="text-sm font-bold border-b-2 bg-green-100 p-2">Shows</h2>
-      )}
-      {data.tvs.map((item) => (
-        <Result item={item} handleAdd={handleAdd} />
-      ))}
+    <div className="absolute z-10 top-10 border-black border-4 w-full h-screen">
+      <div className="h-full w-full opacity-80 bg-gray-400 absolute inset-0"></div>
+      <div className="flex flex-col z-10 relative">
+        {!hasMovies && !hasTvs && (
+          <h2 className="text-sm font-bold border-b-2 bg-blue-100 p-2">
+            No results found
+          </h2>
+        )}
+        {hasMovies && (
+          <h2 className="text-sm font-bold border-b-2 bg-blue-100 p-2">
+            Movies
+          </h2>
+        )}
+        {data.movies.map((item) => (
+          <Result item={item} handleAdd={handleAdd} />
+        ))}
+        {hasTvs && (
+          <h2 className="text-sm font-bold border-b-2 bg-green-100 p-2">
+            Shows
+          </h2>
+        )}
+        {data.tvs.map((item) => (
+          <Result item={item} handleAdd={handleAdd} />
+        ))}
+      </div>
     </div>
   );
 };
