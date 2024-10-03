@@ -1,6 +1,7 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { Database } from "../_shared/database.types.ts";
 import { createClient } from "supabase";
+import type { SendData } from "../_shared/email.ts";
 
 const adminClient = createClient<Database>(
   Deno.env.get("SUPABASE_URL") ?? "",
@@ -28,8 +29,6 @@ Deno.serve(async (req) => {
     if (error) {
       throw error;
     }
-    console.log("date", lastWeek.toISOString().slice(0, 10));
-    console.log("data", data);
 
     // group into emails
     const grouped = data.reduce(
@@ -47,11 +46,10 @@ Deno.serve(async (req) => {
     );
 
     const promises = Object.entries(grouped).map(([email, streams]) => {
-      return adminClient.functions.invoke("send_email_notification", {
-        method: "POST",
-        body: JSON.stringify({
-          email,
-          html: `
+      const data: SendData = {
+        to: email,
+        subject: "Your watchlist items are now available",
+        html: `
           Hi,
           These items from your watchlist are now available on one of your streaming services:
           <ul>
@@ -62,11 +60,23 @@ Deno.serve(async (req) => {
               .join("")}
           </ul>
           `,
-        }),
+      };
+
+      return adminClient.functions.invoke("send-email-notification", {
+        method: "POST",
+        body: JSON.stringify(data),
       });
     });
 
-    await Promise.all(promises);
+    const result = await Promise.allSettled(promises);
+    const failed = result.filter((r) => r.status === "rejected");
+    if (failed.length > 0) {
+      throw new Error(
+        `Failed to send ${failed.length} emails with reasons ${failed.map(
+          (f) => f.reason
+        )}`
+      );
+    }
 
     return new Response(JSON.stringify({}), {
       headers: { "Content-Type": "application/json", ...corsHeaders },
