@@ -2,18 +2,20 @@ import { MultiSelect } from "components/multi_select";
 import { AddMovie } from "pages/add-movie";
 import { Movies } from "pages/movies";
 import { useUserContext } from "providers/user_provider";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   useGetMovies,
   useGetUserProviders,
   useUpdateUserProviders,
 } from "api/movies";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Option } from "react-multi-select-component";
+import { useShareWatchlist } from "hooks/useShareWatchlist";
 
 export const Homepage: React.FC = () => {
-  const { user, isLoggedIn, loading } = useUserContext();
+  const { user, isLoggedIn } = useUserContext();
   const { userId } = useParams();
+  const { isSharing } = useShareWatchlist();
 
   const copyShareLink = async () => {
     if (!user) {
@@ -28,8 +30,6 @@ export const Homepage: React.FC = () => {
       alert("Could not copy to clipboard.");
     }
   };
-
-  const navigate = useNavigate();
 
   const { isLoading, isError, data } = useGetMovies(userId ?? user?.id);
 
@@ -67,12 +67,6 @@ export const Homepage: React.FC = () => {
       .map((p) => ({ label: p, value: p }));
   }, [data?.movies]);
 
-  useEffect(() => {
-    if (!isLoggedIn && !loading) {
-      navigate("/login");
-    }
-  }, [isLoggedIn, loading]);
-
   if (isLoading) return <h1>Loading...</h1>;
   if (isError || !data) return <h1>Error</h1>;
 
@@ -83,7 +77,7 @@ export const Homepage: React.FC = () => {
           <h1 className="text-2xl">Watchlist</h1>
         </Link>
 
-        {isLoggedIn && (
+        {isLoggedIn && !isSharing && (
           <button className="text-md underline" onClick={copyShareLink}>
             Share your watchlist
           </button>
@@ -91,13 +85,17 @@ export const Homepage: React.FC = () => {
       </header>
       <div className="space-y-4">
         <div className="flex flex-col sm:items-center sm:flex-row md:px-4">
-          {userId === undefined && <AddMovie />}
-          <MultiSelect
-            selected={userProviderOptions}
-            options={allProviderOptions}
-            setSelected={handleSelectProviders}
-            label={"Select Providers"}
-          />
+          {isLoggedIn && !isSharing && (
+            <>
+              <AddMovie />
+              <MultiSelect
+                selected={userProviderOptions}
+                options={allProviderOptions}
+                setSelected={handleSelectProviders}
+                label={"Select Providers"}
+              />
+            </>
+          )}
         </div>
 
         <Movies

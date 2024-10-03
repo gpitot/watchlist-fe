@@ -6,12 +6,14 @@ import {
 } from "api/movies";
 import classNames from "classnames";
 import { Stars } from "components/stars";
+import { useShareWatchlist } from "hooks/useShareWatchlist";
 
 export const MovieModal: React.FC<{
   movie?: MovieDetailsResponse;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({ movie, isOpen, setIsOpen }) => {
+  const { isSharing } = useShareWatchlist();
   const { mutateAsync: mutateAsyncToggleWatched } = useToggleWatched();
   const { mutateAsync: mutateAsyncUpdateRating } = useUpdateRating();
   const { mutateAsync: mutateAsyncRemoveMovie } = useRemoveMovie();
@@ -139,20 +141,22 @@ export const MovieModal: React.FC<{
               )}
             </div>
 
-            <div className="flex space-x-4 py-4 w-full">
-              <button
-                className="border-solid border-2 border-black p-2 bg-red-200 rounded-md flex-grow"
-                onClick={removeMovie}
-              >
-                Remove movie
-              </button>
-              <button
-                className="border-solid border-2 border-black p-2 bg-green-200 rounded-md flex-grow"
-                onClick={toggleWatched}
-              >
-                {movie.watched ? "Mark as unwatched" : "Mark as watched"}
-              </button>
-            </div>
+            {!isSharing && (
+              <div className="flex space-x-4 py-4 w-full">
+                <button
+                  className="border-solid border-2 border-black p-2 bg-red-200 rounded-md flex-grow"
+                  onClick={removeMovie}
+                >
+                  Remove movie
+                </button>
+                <button
+                  className="border-solid border-2 border-black p-2 bg-green-200 rounded-md flex-grow"
+                  onClick={toggleWatched}
+                >
+                  {movie.watched ? "Mark as unwatched" : "Mark as watched"}
+                </button>
+              </div>
+            )}
           </div>
         )}
       </dialog>

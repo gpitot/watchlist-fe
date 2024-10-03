@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Homepage } from "pages/homepage";
 import { MemoryBase } from "pages/memories/memory-base";
 import { ViewMemory } from "pages/memories/view-memory";
+import { AuthenticatedRoute } from "components/authenticated_route";
 
 const router = createBrowserRouter([
   {
@@ -12,7 +13,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/watchlist",
-    element: <Homepage />,
+    element: (
+      <AuthenticatedRoute>
+        <Homepage />
+      </AuthenticatedRoute>
+    ),
   },
   {
     path: "/watchlist/share/:userId",
