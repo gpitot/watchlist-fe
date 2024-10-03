@@ -127,20 +127,45 @@ export class MovieAndShowService {
     return this.parseStreamingProvidersResult(res);
   }
 
+  public getFullPosterPath(posterPath?: string | null): string | undefined {
+    if (!posterPath) {
+      return undefined;
+    }
+    return `https://image.tmdb.org/t/p/w300${posterPath}`;
+  }
+
   public async searchByTitle(
     title: string,
     type: Medium
-  ): Promise<{ id: number; name: string } | undefined> {
+  ): Promise<
+    {
+      id: number;
+      name: string;
+      backdrop_path?: string;
+      release_date?: string;
+    }[]
+  > {
     const movieQuery = encodeURI(title);
     const res = await this.myfetch<{
       total_results: number;
-      results: { id: number; name?: string; title: string }[];
+      results: {
+        id: number;
+        name?: string;
+        title: string;
+        backdrop_path?: string | null;
+        release_date?: string;
+      }[];
     }>(`/search/${type}?query=${movieQuery}&language=en-US&page=1`);
-    if (res.total_results === 0) return undefined;
+
     console.log(res.results[0]);
-    return {
-      id: res.results[0].id,
-      name: res.results[0].name ?? res.results[0].title,
-    };
+    return res.results.map((r) => {
+      return {
+        id: r.id,
+        name: r.name ?? r.title,
+        poster_path: this.getFullPosterPath(r.backdrop_path),
+        release_date: r.release_date,
+        medium: type,
+      };
+    });
   }
 }

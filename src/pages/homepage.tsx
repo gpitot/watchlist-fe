@@ -90,7 +90,7 @@ export const Homepage: React.FC = () => {
         )}
       </header>
       <div className="space-y-4">
-        <div className="flex flex-col sm:items-center sm:flex-row">
+        <div className="flex flex-col sm:items-center sm:flex-row md:px-4">
           {userId === undefined && <AddMovie />}
           <MultiSelect
             selected={userProviderOptions}

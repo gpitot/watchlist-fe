@@ -66,6 +66,51 @@ export const useGetMovies = (userId?: string) => {
   });
 };
 
+
+export type Stream = {
+  id: number;
+  name: string;
+  medium: string;
+  poster_path?: string;
+  release_date?: string;
+}
+export const useSearchStreams = () => {
+  return useMutation(async (title: string) => {
+    const { data, error } = await supabase.functions.invoke<{
+      movies: Stream[];
+      tvs: Stream[];
+    }>("search-stream", {
+      method: "POST",
+      body: JSON.stringify({ title }),
+    });
+    if (error) {
+      throw error;
+    }
+    return data;
+  });
+};
+
+export const useAddMovie = () => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    async (body: { id: number; medium: string }): Promise<void> => {
+      const { data, error } = await supabase.functions.invoke("add_movie", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+      if (error) {
+        throw error;
+      }
+      return data;
+    },
+    {
+      onSuccess: async () => {
+        queryClient.invalidateQueries("movies");
+      },
+    }
+  );
+};
+
 export const useToggleWatched = () => {
   const queryClient = useQueryClient();
   return useMutation({

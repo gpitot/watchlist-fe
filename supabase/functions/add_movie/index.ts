@@ -1,69 +1,26 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { Database } from "../_shared/database.types.ts";
-import { MovieAndShowService, Medium } from "../_shared/movie_service.ts";
+import { MovieAndShowService } from "../_shared/movie_service.ts";
 import { createClient } from "supabase";
-import * as StringSimilarity from "string-similarity";
+
+import { z } from "zod";
+
+const Body = z.object({
+  id: z.number(),
+  medium: z.literal("movie").or(z.literal("tv")),
+});
+type Body = z.infer<typeof Body>;
 
 const movieAndShowService = new MovieAndShowService();
-
-const determineMovieOrShow = async (
-  title: string
-): Promise<{ id: number; medium: Medium } | undefined> => {
-  const movie = await movieAndShowService.searchByTitle(title, "movie");
-  const tv = await movieAndShowService.searchByTitle(title, "tv");
-
-  if (movie && tv) {
-    const { id: movieId, name: movieName } = movie;
-    const { id: tvId, name: tvName } = tv;
-
-    const movieSimilarity = StringSimilarity.compareTwoStrings(
-      title,
-      movieName
-    );
-    const tvSimilarity = StringSimilarity.compareTwoStrings(title, tvName);
-
-    console.log(
-      "Movie and Tv found: ",
-      movieName,
-      tvName,
-      movieSimilarity,
-      tvSimilarity
-    );
-
-    if (movieSimilarity > tvSimilarity) {
-      return {
-        id: movieId,
-        medium: "movie",
-      };
-    }
-    return {
-      id: tvId,
-      medium: "tv",
-    };
-  }
-
-  if (movie) {
-    return {
-      id: movie.id,
-      medium: "movie",
-    };
-  }
-  if (tv) {
-    return {
-      id: tv.id,
-      medium: "tv",
-    };
-  }
-  return undefined;
-};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
   try {
-    const { title } = await req.json();
-    console.log("Movie title to add: ", title);
+    const body = await req.json();
+    const { id: recordId, medium } = Body.parse(body);
+    console.log("Movie title to add: ", recordId, medium);
 
     const authHeader = req.headers.get("Authorization")!;
     const anonClient = createClient<Database>(
@@ -81,17 +38,6 @@ Deno.serve(async (req) => {
         headers: corsHeaders,
       });
     }
-
-    const result = await determineMovieOrShow(title);
-
-    if (!result) {
-      return new Response("Movie not found", {
-        status: 404,
-        headers: corsHeaders,
-      });
-    }
-
-    const { id: recordId, medium } = result;
 
     const { data } = await anonClient
       .from("movies")
