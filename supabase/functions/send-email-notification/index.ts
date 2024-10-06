@@ -8,7 +8,7 @@ if (!SENDGRID_API_KEY) {
 }
 Sendgrid.setApiKey(SENDGRID_API_KEY);
 
-export const DEFAULT_FROM = "northmanlysquashclub@gmail.com";
+export const DEFAULT_FROM = "guillaume.pitot@gmail.com";
 
 export const sendMail = async (data: SendData) => {
   const res = await Sendgrid.send({ ...data, from: DEFAULT_FROM });
