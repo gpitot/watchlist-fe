@@ -11,8 +11,8 @@ import { useShareWatchlist } from "hooks/useShareWatchlist";
 export const MovieModal: React.FC<{
   movie?: MovieDetailsResponse;
   isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ movie, isOpen, setIsOpen }) => {
+  onModalClose: () => void;
+}> = ({ movie, isOpen, onModalClose }) => {
   const { isSharing } = useShareWatchlist();
   const { mutateAsync: mutateAsyncToggleWatched } = useToggleWatched();
   const { mutateAsync: mutateAsyncUpdateRating } = useUpdateRating();
@@ -23,7 +23,7 @@ export const MovieModal: React.FC<{
       return;
     }
     await mutateAsyncToggleWatched(movie);
-    setIsOpen(false);
+    onModalClose();
   };
 
   const updateRating = async (rating: number) => {
@@ -31,7 +31,7 @@ export const MovieModal: React.FC<{
       return;
     }
     await mutateAsyncUpdateRating({ id: movie.id, rating: rating + 1 });
-    setIsOpen(false);
+    onModalClose();
   };
 
   const removeMovie = async () => {
@@ -39,10 +39,10 @@ export const MovieModal: React.FC<{
       return;
     }
     await mutateAsyncRemoveMovie({ id: movie.id });
-    setIsOpen(false);
+    onModalClose();
   };
 
-  if (isOpen && !movie) {
+  if (!movie) {
     return null;
   }
 
@@ -59,7 +59,7 @@ export const MovieModal: React.FC<{
       className={classNames({
         "fixed inset-0 w-full h-screen z-10 backdrop-blur-sm": isOpen,
       })}
-      onClick={() => setIsOpen(false)}
+      onClick={onModalClose}
     >
       <dialog
         open={isOpen}
@@ -86,7 +86,7 @@ export const MovieModal: React.FC<{
 
               <button
                 className="border-solid border-2 border-black px-2 bg-gray-200 rounded-md ml-auto"
-                onClick={() => setIsOpen(false)}
+                onClick={onModalClose}
               >
                 X
               </button>

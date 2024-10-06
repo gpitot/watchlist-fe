@@ -98,11 +98,16 @@ const TableUI: React.FC<{
     setModalIsOpen(true);
   };
 
+  const onModalClose = () => {
+    setModalIsOpen(false);
+    setCurrentMovie(undefined);
+  };
+
   return (
     <>
       <MovieModal
         isOpen={modalIsOpen}
-        setIsOpen={setModalIsOpen}
+        onModalClose={onModalClose}
         movie={currentMovie}
       />
       <div className="relative w-screen overflow-x-auto">

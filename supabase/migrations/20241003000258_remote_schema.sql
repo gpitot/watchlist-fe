@@ -1,7 +1,9 @@
 create extension if not exists "pg_cron" with schema "extensions";
 
 
-create or replace view "public"."available_streams" as  SELECT users.email,
+create or replace view "public"."available_streams"
+  with (security_invoker=on)
+ as  SELECT users.email,
     movies.title,
     movie_providers.provider_name,
     movie_providers.provider_type,
