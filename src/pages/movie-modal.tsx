@@ -1,5 +1,6 @@
 import {
   MovieDetailsResponse,
+  useGetTrailer,
   useRemoveMovie,
   useToggleWatched,
   useUpdateRating,
@@ -17,6 +18,8 @@ export const MovieModal: React.FC<{
   const { mutateAsync: mutateAsyncToggleWatched } = useToggleWatched();
   const { mutateAsync: mutateAsyncUpdateRating } = useUpdateRating();
   const { mutateAsync: mutateAsyncRemoveMovie } = useRemoveMovie();
+
+  const { data: trailer } = useGetTrailer(movie?.id);
 
   const toggleWatched = async () => {
     if (!movie) {
@@ -82,7 +85,19 @@ export const MovieModal: React.FC<{
         {movie && (
           <div className="space-y-2">
             <div className="flex">
-              <h1 className="text-lg underline">{movie.title}</h1>
+              <h1
+                className={classNames("text-lg", {
+                  underline: trailer,
+                })}
+              >
+                {trailer ? (
+                  <a href={trailer} target="_blank" rel="noreferrer">
+                    {movie.title}
+                  </a>
+                ) : (
+                  movie.title
+                )}
+              </h1>
 
               <button
                 className="border-solid border-2 border-black px-2 bg-gray-200 rounded-md ml-auto"

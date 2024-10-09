@@ -24,6 +24,28 @@ export type MovieDetailsResponse = {
   }[];
 };
 
+export const useGetTrailer = (movieId?: number) => {
+  return useQuery({
+    queryKey: ["movie_videos", movieId],
+    enabled: movieId !== undefined,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("movie_videos")
+        .select("url")
+        .match({ movie_id: movieId, video_type: "Trailer" })
+        .order("published_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data ? data.url : undefined;
+    },
+  });
+};
+
 export const useGetMovies = (userId?: string) => {
   return useQuery({
     queryKey: ["movies"],
@@ -48,7 +70,6 @@ export const useGetMovies = (userId?: string) => {
       if (error) {
         throw new Error(error.message);
       }
-
       const movies: MovieDetailsResponse[] = data.map((movie) => {
         if (movie.movies === null) {
           throw new Error("Movie not found");
@@ -66,14 +87,13 @@ export const useGetMovies = (userId?: string) => {
   });
 };
 
-
 export type Stream = {
   id: number;
   name: string;
   medium: string;
   poster_path?: string;
   release_date?: string;
-}
+};
 export const useSearchStreams = () => {
   return useMutation(async (title: string) => {
     const { data, error } = await supabase.functions.invoke<{

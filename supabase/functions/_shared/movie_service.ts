@@ -1,3 +1,5 @@
+import type { Database } from "./database.types.ts";
+
 type MovieDetails = {
   name?: string; // for tv shows
   title: string;
@@ -19,6 +21,13 @@ type MovieDetails = {
       };
     };
   };
+};
+
+type Video = {
+  site?: string;
+  type?: string;
+  key?: string;
+  published_at?: string;
 };
 
 export type MovieDetailsResponse = {
@@ -168,4 +177,33 @@ export class MovieAndShowService {
       };
     });
   }
+
+  public async getVideos(id: number, type: Medium) {
+    const res = await this.myfetch<{ results: Video[] }>(
+      `/${type}/${id}/videos`
+    );
+    return res.results;
+  }
+
+  public parseVideos(videos: Video[]): DBVideo[] {
+    const createUrl = (video: Video) => {
+      if (video.site === "YouTube") {
+        return `https://www.youtube.com/watch?v=${video.key}`;
+      }
+      return undefined;
+    };
+
+    return videos
+      .map((v) => ({
+        published_at: v.published_at!,
+        url: createUrl(v),
+        video_type: v.type ?? null,
+      }))
+      .filter((v): v is DBVideo => Boolean(v.published_at && v.url));
+  }
 }
+
+type DBVideo = Omit<
+  Database["public"]["Tables"]["movie_videos"]["Row"],
+  "created_at" | "id" | "movie_id"
+>;

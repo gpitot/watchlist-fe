@@ -102,6 +102,11 @@ Deno.serve(async (req) => {
           provider_type: provider.type,
         }))
       );
+
+      anonClient.functions.invoke("add-movie-videos", {
+        method: "POST",
+        body: JSON.stringify({ movieId: movie.id }),
+      });
     }
 
     if (!dbMovieId) {

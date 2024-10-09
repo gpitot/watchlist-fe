@@ -72,7 +72,11 @@ const Results: React.FC<{
 };
 
 const AddMovie: React.FC = () => {
-  const { mutate: search, data } = useSearchStreams();
+  const {
+    mutate: search,
+    data,
+    isLoading: isSearchLoading,
+  } = useSearchStreams();
   const { mutate: add, isLoading } = useAddMovie();
 
   const [title, setTitle] = useState("");
@@ -88,7 +92,7 @@ const AddMovie: React.FC = () => {
         return;
       }
       search(title);
-    }, 1000),
+    }, 300),
     []
   );
 
@@ -99,14 +103,30 @@ const AddMovie: React.FC = () => {
 
   return (
     <div className="flex flex-col relative w-[400px] max-w-full">
-      <input
-        type="text"
-        className="border-2 p-2 w-full max-w-full border-black"
-        placeholder="Add a movie or show to your watchlist"
-        onChange={handleChange}
-        value={title}
-        disabled={isLoading}
-      />
+      <div className="relative">
+        <input
+          type="text"
+          className="border-2 p-2 w-full max-w-full border-black"
+          placeholder="Add a movie or show to your watchlist"
+          onChange={handleChange}
+          value={title}
+          disabled={isLoading}
+        />
+        <div className="absolute top-0 right-0 h-full w-10 flex flex-col justify-center">
+          {isSearchLoading && (
+            <span className="block rounded-full h-6 w-6 border-2 bg-white border-blue-400"></span>
+          )}
+          {!isSearchLoading && (
+            <span
+              className="block h-6 w-6 cursor-pointer"
+              onClick={() => setTitle("")}
+            >
+              X
+            </span>
+          )}
+        </div>
+      </div>
+
       {title.length > 0 && <Results data={data} handleAdd={handleAdd} />}
     </div>
   );

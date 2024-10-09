@@ -120,6 +120,41 @@ export type Database = {
           },
         ]
       }
+      movie_videos: {
+        Row: {
+          created_at: string
+          id: string
+          movie_id: number
+          published_at: string
+          url: string
+          video_type: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          movie_id: number
+          published_at: string
+          url: string
+          video_type?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          movie_id?: number
+          published_at?: string
+          url?: string
+          video_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_movie_videos_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       movies: {
         Row: {
           created_at: string
