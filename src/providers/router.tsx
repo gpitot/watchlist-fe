@@ -5,6 +5,7 @@ import { Homepage } from "pages/homepage";
 import { MemoryBase } from "pages/memories/memory-base";
 import { ViewMemory } from "pages/memories/view-memory";
 import { AuthenticatedRoute } from "components/authenticated_route";
+import { ResetPasswordPage } from "pages/reset-password";
 
 const router = createBrowserRouter([
   {
@@ -29,7 +30,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/reset-password",
-    element: <LoginPage />,
+    element: <ResetPasswordPage />,
   },
 
   {

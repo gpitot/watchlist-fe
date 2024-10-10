@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "api/database";
 import { useNavigate } from "react-router-dom";
 
-export const LoginPage: React.FC = () => {
+export const ResetPasswordPage: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
 
   const navigate = useNavigate();
