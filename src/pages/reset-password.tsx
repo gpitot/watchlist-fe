@@ -27,23 +27,21 @@ export const LoginPage: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  if (!session) {
-    return (
-      <div className="p-4 ">
-        <Auth
-          supabaseClient={supabase}
-          appearance={{
-            theme: ThemeSupa,
-            className: {
-              button: "text-black border-black ",
-            },
-          }}
-          redirectTo={`${window.location.origin}/reset-password`}
-          providers={[]}
-        />
-      </div>
-    );
+  if (session) {
+    return null;
   }
 
-  return null;
+  return (
+    <div className="p-4 ">
+      <Auth.UpdatePassword
+        supabaseClient={supabase}
+        appearance={{
+          theme: ThemeSupa,
+          className: {
+            button: "text-black border-black ",
+          },
+        }}
+      />
+    </div>
+  );
 };
