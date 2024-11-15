@@ -4,6 +4,8 @@ import { useState } from "react";
 import { MovieDetailsResponse } from "api/movies";
 import { MovieModal } from "pages/movie-modal";
 import { Stars } from "components/stars";
+import { SettingsModal } from "pages/settings-modal";
+import { Filter } from "pages/filter";
 
 const columns: [
   string,
@@ -110,6 +112,9 @@ const TableUI: React.FC<{
         onModalClose={onModalClose}
         movie={currentMovie}
       />
+      <SettingsModal isOpen onModalClose={() => {}}>
+        <Filter />
+      </SettingsModal>
       <div className="relative w-screen overflow-x-auto">
         <table className="w-full">
           <thead>

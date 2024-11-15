@@ -1,4 +1,3 @@
-import { MultiSelect } from "components/multi_select";
 import { AddMovie } from "pages/add-movie";
 import { Movies } from "pages/movies";
 import { useUserContext } from "providers/user_provider";
@@ -83,17 +82,11 @@ export const Homepage: React.FC = () => {
           </button>
         )}
       </header>
-      <div className="space-y-4">
+      <div>
         <div className="flex flex-col sm:items-center sm:flex-row md:px-4">
           {isLoggedIn && !isSharing && (
             <>
               <AddMovie />
-              <MultiSelect
-                selected={userProviderOptions}
-                options={allProviderOptions}
-                setSelected={handleSelectProviders}
-                label={"Select Providers"}
-              />
             </>
           )}
         </div>
