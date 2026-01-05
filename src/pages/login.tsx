@@ -39,7 +39,7 @@ export const LoginPage: React.FC = () => {
             },
           }}
           redirectTo={`${window.location.origin}/reset-password`}
-          providers={[]}
+          providers={['google']}
         />
       </div>
     );
