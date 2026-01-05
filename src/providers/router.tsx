@@ -1,10 +1,17 @@
-import { LoginPage } from "pages/login";
+import { LoginForm } from "pages/login";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Homepage } from "pages/homepage";
 import { AuthenticatedRoute } from "components/authenticated_route";
-import { ResetPasswordPage } from "pages/reset-password";
 
 const router = createBrowserRouter([
+  {
+    path: "/watchlist",
+    element: (
+      <AuthenticatedRoute>
+        <Homepage />
+      </AuthenticatedRoute>
+    ),
+  },
   {
     path: "/",
     element: (
@@ -19,11 +26,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    path: "/reset-password",
-    element: <ResetPasswordPage />,
+    element: <LoginForm />,
   },
 ]);
 
