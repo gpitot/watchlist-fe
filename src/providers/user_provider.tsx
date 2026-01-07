@@ -12,10 +12,12 @@ type UserContext =
   | {
       user: User;
       isLoggedIn: true;
+      isAnonymous: boolean;
       loading: boolean;
     }
   | {
       isLoggedIn: false;
+      isAnonymous: false;
       loading: boolean;
       user?: undefined;
     };
@@ -45,10 +47,12 @@ export const UserProvider: React.FC<PropsWithChildren> = ({ children }) => {
     ? {
         user: session.user,
         isLoggedIn: true,
+        isAnonymous: session.user.is_anonymous ?? false,
         loading,
       }
     : {
         isLoggedIn: false,
+        isAnonymous: false,
         loading,
       };
 

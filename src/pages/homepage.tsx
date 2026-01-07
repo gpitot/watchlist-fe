@@ -2,7 +2,7 @@ import { MultiSelect } from "components/multi_select";
 import { AddMovie } from "pages/add-movie";
 import { Movies } from "pages/movies";
 import { useUserContext } from "providers/user_provider";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   useGetMovies,
   useGetUserProviders,
@@ -11,11 +11,13 @@ import {
 import { useMemo } from "react";
 import { Option } from "components/multi_select";
 import { useShareWatchlist } from "hooks/useShareWatchlist";
+import { supabase } from "api/database";
 
 export const Homepage: React.FC = () => {
-  const { user, isLoggedIn } = useUserContext();
+  const { user, isLoggedIn, isAnonymous } = useUserContext();
   const { userId } = useParams();
   const { isSharing } = useShareWatchlist();
+  const navigate = useNavigate();
 
   const copyShareLink = async () => {
     if (!user) {
@@ -28,6 +30,27 @@ export const Homepage: React.FC = () => {
       alert("Copied to clipboard!");
     } catch (e) {
       alert("Could not copy to clipboard.");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  const handleConvertToPermanent = async () => {
+    try {
+      const { error } = await supabase.auth.linkIdentity({
+        provider: "google",
+      });
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error converting to permanent account:", error);
+      alert("Could not convert account. Please try again.");
     }
   };
 
@@ -128,29 +151,112 @@ export const Homepage: React.FC = () => {
             </Link>
 
             {isLoggedIn && !isSharing && (
-              <button
-                onClick={copyShareLink}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/80 hover:text-white transition-all text-sm font-medium"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={copyShareLink}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/80 hover:text-white transition-all text-sm font-medium"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-                  />
-                </svg>
-                Share
-              </button>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                    />
+                  </svg>
+                  Share
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/80 hover:text-white transition-all text-sm font-medium"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    />
+                  </svg>
+                  Logout
+                </button>
+              </div>
             )}
           </div>
         </div>
       </header>
+
+      {isLoggedIn && isAnonymous && !isSharing && (
+        <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-b border-purple-500/30">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-purple-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-white font-medium">
+                    You're using a temporary account
+                  </p>
+                  <p className="text-white/60 text-sm">
+                    Save your watchlist permanently by creating an account
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleConvertToPermanent}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-gray-100 text-slate-800 font-medium transition-all shadow-lg whitespace-nowrap"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 48 48"
+                  className="w-4 h-4"
+                >
+                  <path
+                    fill="#EA4335"
+                    d="M24 9.5c3.9 0 6.7 1.7 8.2 3.1l6-6C34.9 3 30.9 1.5 24 1.5 14 1.5 6.1 7.9 2.7 16.3l7.3 5.7C11.7 17 17.3 9.5 24 9.5z"
+                  />
+                  <path
+                    fill="#4285F4"
+                    d="M46.5 24.5c0-1.6-.1-2.8-.4-4.1H24v8h12.7c-.6 3-2.4 5.5-5 7.2l7.3 5.7c4.3-4 7-10 7-16.8z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M10.5 28.5c-.5-1.5-.8-3-.8-4.5s.3-3 .8-4.5l-7.3-5.7C1.2 17.5 0 20.6 0 24s1.2 6.5 3.2 10.2l7.3-5.7z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M24 47c6.5 0 12-2.1 16-5.7l-7.3-5.7c-2.2 1.5-5 2.4-8.7 2.4-6.7 0-12.4-4.5-14.4-10.5l-7.3 5.7C6.1 41.1 14 47 24 47z"
+                  />
+                </svg>
+                Create Account with Google
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {isLoggedIn && !isSharing && (
