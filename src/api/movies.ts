@@ -248,10 +248,10 @@ export const useUpdateUserProviders = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({
-      providers,
+      providersAdded,
       providersToDelete,
     }: {
-      providers: string[];
+      providersAdded: string[];
       providersToDelete: string[];
     }) => {
       const {
@@ -261,6 +261,8 @@ export const useUpdateUserProviders = () => {
         throw new Error("Not logged in");
       }
 
+      console.log("[g] mutate", providersAdded, providersToDelete);
+
       if (providersToDelete.length > 0) {
         await supabase
           .from("user_providers")
@@ -268,14 +270,19 @@ export const useUpdateUserProviders = () => {
           .match({ id: user.id, provider_name: providersToDelete });
       }
 
-      await supabase.from("user_providers").upsert(
-        providers.map((provider_name) => ({
-          id: user.id,
-          provider_name,
-        }))
-      );
+      if (providersAdded.length > 0) {
+        await supabase.from("user_providers").upsert(
+          providersAdded.map((provider_name) => ({
+            id: user.id,
+            provider_name,
+          }))
+        );
+      }
     },
-    onSuccess: () => {
+    onMutate: async () => {},
+    onError: (_err, _variables) => {},
+    onSettled: () => {
+      // Always refetch after error or success to ensure server state
       queryClient.invalidateQueries("providers");
     },
   });

@@ -23,9 +23,9 @@
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "react": "^18.2.0",
+    "react-aria-components": "1.14.0",
     "react-dom": "^18.2.0",
     "react-final-form": "^6.5.9",
-    "react-multi-select-component": "^4.3.4",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.21.1"
   },

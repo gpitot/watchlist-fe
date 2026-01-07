@@ -9,7 +9,7 @@ import {
   useUpdateUserProviders,
 } from "api/movies";
 import { useMemo } from "react";
-import { Option } from "react-multi-select-component";
+import { Option } from "components/multi_select";
 import { useShareWatchlist } from "hooks/useShareWatchlist";
 
 export const Homepage: React.FC = () => {
@@ -47,11 +47,17 @@ export const Homepage: React.FC = () => {
     const previousSelected = userProviderOptions.map((p) => p.value);
     const currentSelected = selected.map((s) => s.value);
 
+    console.log("[g] previousSelected ", previousSelected, currentSelected);
+
     const providersToDelete = previousSelected.filter(
       (p) => !currentSelected.includes(p)
     );
 
-    mutate({ providers: currentSelected, providersToDelete });
+    const providersAdded = currentSelected.filter(
+      (p) => !previousSelected.includes(p)
+    );
+
+    mutate({ providersAdded, providersToDelete });
   };
 
   const allProviderOptions = useMemo(() => {
@@ -67,42 +73,120 @@ export const Homepage: React.FC = () => {
       .map((p) => ({ label: p, value: p }));
   }, [data?.movies]);
 
-  if (isLoading) return <h1>Loading...</h1>;
-  if (isError || !data) return <h1>Error</h1>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-purple-400 border-t-transparent rounded-full animate-spin" />
+          <p className="text-white/70 text-lg">Loading your watchlist...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-8 text-center">
+          <p className="text-red-400 text-lg">Something went wrong</p>
+          <p className="text-white/50 mt-2">Please try again later</p>
+        </div>
+      </div>
+    );
+  }
+
+  console.log(
+    "[g] allProviderOptions ",
+    allProviderOptions,
+    userProviderOptions
+  );
 
   return (
-    <>
-      <header className="p-4 py-8 bg-cover bg-[url('https://img.freepik.com/free-vector/cinema-film-festival-movie-poster-background_1017-33461.jpg')] text-white  flex justify-between align-middle bg-url">
-        <Link to="/">
-          <h1 className="text-2xl">Watchlist</h1>
-        </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-slate-900/70 border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link to="/" className="group flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:shadow-purple-500/40 transition-shadow">
+                <svg
+                  className="w-5 h-5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
+                  />
+                </svg>
+              </div>
+              <h1 className="text-xl font-semibold text-white group-hover:text-purple-300 transition-colors">
+                Watchlist
+              </h1>
+            </Link>
 
-        {isLoggedIn && !isSharing && (
-          <button className="text-md underline" onClick={copyShareLink}>
-            Share your watchlist
-          </button>
-        )}
-      </header>
-      <div className="space-y-4">
-        <div className="flex flex-col sm:items-center sm:flex-row md:px-4">
-          {isLoggedIn && !isSharing && (
-            <>
-              <AddMovie />
-              <MultiSelect
-                selected={userProviderOptions}
-                options={allProviderOptions}
-                setSelected={handleSelectProviders}
-                label={"Select Providers"}
-              />
-            </>
-          )}
+            {isLoggedIn && !isSharing && (
+              <button
+                onClick={copyShareLink}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/80 hover:text-white transition-all text-sm font-medium"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+                  />
+                </svg>
+                Share
+              </button>
+            )}
+          </div>
         </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {isLoggedIn && !isSharing && (
+          <div className="mb-8 p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+              <div className="flex-1">
+                <AddMovie />
+              </div>
+              <div className="lg:w-80">
+                <label className="block text-sm font-medium text-white/60 mb-2">
+                  Streaming Services
+                </label>
+                <MultiSelect
+                  selected={userProviderOptions}
+                  options={allProviderOptions}
+                  setSelected={handleSelectProviders}
+                  label={"Select Providers"}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isSharing && (
+          <div className="mb-8 p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-center">
+            <p className="text-purple-300 text-sm">
+              You're viewing a shared watchlist
+            </p>
+          </div>
+        )}
 
         <Movies
           movies={data.movies}
           availableProviders={userProviderOptions.map((p) => p.value)}
         />
-      </div>
-    </>
+      </main>
+    </div>
   );
 };
