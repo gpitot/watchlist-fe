@@ -72,9 +72,9 @@ const MovieCard: React.FC<{
     <button
       onClick={onClick}
       className={classNames(
-        "w-full text-left p-4 rounded-xl border transition-all duration-200",
+        "w-full text-left p-3 sm:p-4 rounded-xl border transition-all duration-200",
         "hover:bg-white/10 hover:border-white/20 hover:shadow-lg hover:shadow-purple-500/5",
-        "focus:outline-none focus:ring-2 focus:ring-purple-500/50",
+        "focus:outline-none focus:ring-2 focus:ring-purple-500/50 active:scale-[0.98]",
         {
           "bg-white/5 border-white/10": state === "unavailable",
           "bg-green-500/5 border-green-500/20": state === "available",
@@ -82,32 +82,34 @@ const MovieCard: React.FC<{
         }
       )}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h3
-              className={classNames(
-                "font-medium truncate",
-                state === "watched" ? "text-white/60" : "text-white"
+      <div className="flex flex-col gap-2.5">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-baseline gap-1.5 flex-wrap mb-1">
+              <h3
+                className={classNames(
+                  "font-medium text-base sm:text-lg",
+                  state === "watched" ? "text-white/60" : "text-white"
+                )}
+              >
+                {movie.title}
+              </h3>
+              {year && (
+                <span className="text-white/40 text-sm flex-shrink-0">({year})</span>
               )}
-            >
-              {movie.title}
-            </h3>
-            {year && (
-              <span className="text-white/40 text-sm">({year})</span>
-            )}
+            </div>
             <StateIndicator state={state} />
           </div>
 
-          {genres && (
-            <p className="text-white/40 text-sm mt-1 truncate">{genres}</p>
+          {movie.rating && (
+            <div className="flex-shrink-0 mt-0.5">
+              <Stars rating={movie.rating} size="sm" />
+            </div>
           )}
         </div>
 
-        {movie.rating && (
-          <div className="flex-shrink-0">
-            <Stars rating={movie.rating} size="sm" />
-          </div>
+        {genres && (
+          <p className="text-white/40 text-sm line-clamp-1">{genres}</p>
         )}
       </div>
     </button>
@@ -164,19 +166,19 @@ const TableUI: React.FC<{
       />
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <h2 className="text-lg font-medium text-white">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <h2 className="text-lg md:text-xl font-medium text-white">
             Your Watchlist
             <span className="text-white/40 font-normal ml-2">
               ({filteredData.length} {filteredData.length === 1 ? "title" : "titles"})
             </span>
           </h2>
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2 text-sm overflow-x-auto pb-2 -mb-2 md:pb-0 md:mb-0">
             {availableCount > 0 && (
               <button
                 onClick={() => toggleFilter("available")}
                 className={classNames(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all whitespace-nowrap flex-shrink-0",
                   filter === "available"
                     ? "bg-green-500/20 border-green-500/40 text-green-300"
                     : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white/70"
@@ -190,7 +192,7 @@ const TableUI: React.FC<{
               <button
                 onClick={() => toggleFilter("unavailable")}
                 className={classNames(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all whitespace-nowrap flex-shrink-0",
                   filter === "unavailable"
                     ? "bg-white/20 border-white/30 text-white/70"
                     : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white/70"
@@ -204,7 +206,7 @@ const TableUI: React.FC<{
               <button
                 onClick={() => toggleFilter("watched")}
                 className={classNames(
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all whitespace-nowrap flex-shrink-0",
                   filter === "watched"
                     ? "bg-purple-500/20 border-purple-500/40 text-purple-300"
                     : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white/70"
@@ -228,22 +230,22 @@ const TableUI: React.FC<{
         </div>
 
         {data.length === 0 ? (
-          <div className="text-center py-12 text-white/40">
-            <p>Your watchlist is empty</p>
+          <div className="text-center py-12 px-4 text-white/40">
+            <p className="text-base">Your watchlist is empty</p>
             <p className="text-sm mt-1">Add movies or shows to get started</p>
           </div>
         ) : filteredData.length === 0 ? (
-          <div className="text-center py-12 text-white/40">
-            <p>No movies match this filter</p>
+          <div className="text-center py-12 px-4 text-white/40">
+            <p className="text-base">No movies match this filter</p>
             <button
               onClick={() => setFilter("all")}
-              className="text-sm mt-2 text-purple-400 hover:text-purple-300 underline"
+              className="text-sm mt-2 text-purple-400 hover:text-purple-300 underline active:text-purple-200"
             >
               Clear filter
             </button>
           </div>
         ) : (
-          <div className="grid gap-2">
+          <div className="grid gap-2.5">
             {filteredData.map((movie) => {
               const movieState = getMovieState(movie, availableProviders);
               return (
