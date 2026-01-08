@@ -69,13 +69,13 @@ export const MovieModal: React.FC<{
       )}
       onClick={onModalClose}
     >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-bg-primary/60 backdrop-blur-sm" />
 
       <div
         className={classNames(
           "relative w-full sm:max-w-lg max-h-[90vh] sm:max-h-[85vh] flex flex-col",
-          "bg-slate-900 border border-white/10 rounded-t-3xl sm:rounded-2xl",
-          "shadow-2xl shadow-purple-500/10",
+          "bg-bg-primary border border-border-default rounded-t-3xl sm:rounded-2xl",
+          "shadow-2xl shadow-primary-sm",
           "transform transition-transform duration-200",
           {
             "translate-y-0": isOpen,
@@ -86,17 +86,17 @@ export const MovieModal: React.FC<{
       >
         {/* Mobile drag indicator */}
         <div className="sm:hidden flex justify-center pt-2">
-          <div className="w-10 h-1 bg-white/20 rounded-full" />
+          <div className="w-10 h-1 bg-border-hover rounded-full" />
         </div>
 
-        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-5 bg-slate-900 border-b border-white/10">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 sm:p-5 bg-bg-primary border-b border-border-default">
           <div className="flex-1 min-w-0 pr-3">
             {trailer ? (
               <a
                 href={trailer}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex items-center gap-2 text-white active:text-purple-300 sm:hover:text-purple-300 transition-colors"
+                className="group flex items-center gap-2 text-text-primary active:text-primary-lighter sm:hover:text-primary-lighter transition-colors"
               >
                 <h2 className="text-lg sm:text-xl font-semibold truncate">
                   {movie.title}
@@ -122,7 +122,7 @@ export const MovieModal: React.FC<{
                 </svg>
               </a>
             ) : (
-              <h2 className="text-lg sm:text-xl font-semibold text-white truncate">
+              <h2 className="text-lg sm:text-xl font-semibold text-text-primary truncate">
                 {movie.title}
               </h2>
             )}
@@ -130,7 +130,7 @@ export const MovieModal: React.FC<{
 
           <button
             onClick={onModalClose}
-            className="p-2 rounded-full bg-white/5 active:bg-white/10 sm:hover:bg-white/10 text-white/60 active:text-white sm:hover:text-white transition-colors flex-shrink-0"
+            className="p-2 rounded-full bg-surface active:bg-surface-hover sm:hover:bg-surface-hover text-text-secondary active:text-text-primary sm:hover:text-text-primary transition-colors flex-shrink-0"
           >
             <svg
               className="w-5 h-5"
@@ -149,35 +149,35 @@ export const MovieModal: React.FC<{
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5">
-          <p className="text-white/70 text-sm leading-relaxed">
+          <p className="text-text-secondary text-sm leading-relaxed">
             {movie.description}
           </p>
 
           <div className="flex items-center gap-3">
-            <span className="text-white/50 text-sm">Your rating:</span>
+            <span className="text-text-tertiary text-sm">Your rating:</span>
             <Stars rating={rating} handleClick={updateRating} />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
             {movie.production && (
               <div className="space-y-1">
-                <p className="text-white/40 text-xs uppercase tracking-wider">
+                <p className="text-text-tertiary text-xs uppercase tracking-wider">
                   Production
                 </p>
-                <p className="text-white/80">{movie.production}</p>
+                <p className="text-text-secondary">{movie.production}</p>
               </div>
             )}
 
             {providers.length > 0 && (
               <div className="space-y-1">
-                <p className="text-white/40 text-xs uppercase tracking-wider">
+                <p className="text-text-tertiary text-xs uppercase tracking-wider">
                   Available on
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {providers.map((provider) => (
                     <span
                       key={provider.provider_name}
-                      className="inline-block px-2.5 py-1 bg-green-500/20 text-green-300 text-xs rounded-full border border-green-500/30"
+                      className="inline-block px-2.5 py-1 bg-success/20 text-success-lighter text-xs rounded-full border border-success/30"
                     >
                       {provider.provider_name}
                     </span>
@@ -188,23 +188,23 @@ export const MovieModal: React.FC<{
           </div>
 
           {(cast.length > 0 || crew.length > 0) && (
-            <div className="pt-2 border-t border-white/10 space-y-3">
+            <div className="pt-2 border-t border-border-default space-y-3">
               {cast.length > 0 && (
                 <div className="space-y-1">
-                  <p className="text-white/40 text-xs uppercase tracking-wider">
+                  <p className="text-text-tertiary text-xs uppercase tracking-wider">
                     Cast
                   </p>
-                  <p className="text-white/70 text-sm">
+                  <p className="text-text-secondary text-sm">
                     {cast.map((actor) => actor.name).join(", ")}
                   </p>
                 </div>
               )}
               {crew.length > 0 && (
                 <div className="space-y-1">
-                  <p className="text-white/40 text-xs uppercase tracking-wider">
+                  <p className="text-text-tertiary text-xs uppercase tracking-wider">
                     Crew
                   </p>
-                  <p className="text-white/70 text-sm">
+                  <p className="text-text-secondary text-sm">
                     {crew.map((member) => member.name).join(", ")}
                   </p>
                 </div>
@@ -213,10 +213,10 @@ export const MovieModal: React.FC<{
           )}
 
           {!isSharing && (
-            <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 pt-3 sm:pt-4 border-t border-white/10">
+            <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 pt-3 sm:pt-4 border-t border-border-default">
               <button
                 onClick={removeMovie}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 rounded-xl bg-red-500/10 active:bg-red-500/20 sm:hover:bg-red-500/20 text-red-400 active:text-red-300 sm:hover:text-red-300 border border-red-500/20 active:border-red-500/30 sm:hover:border-red-500/30 transition-colors text-sm font-medium active:scale-[0.98]"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 rounded-xl bg-error/10 active:bg-error/20 sm:hover:bg-error/20 text-error-light active:text-error-lighter sm:hover:text-error-lighter border border-error/20 active:border-error/30 sm:hover:border-error/30 transition-colors text-sm font-medium active:scale-[0.98]"
               >
                 <svg
                   className="w-4 h-4"
@@ -238,8 +238,8 @@ export const MovieModal: React.FC<{
                 className={classNames(
                   "flex-1 flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 rounded-xl border transition-colors text-sm font-medium active:scale-[0.98]",
                   movie.watched
-                    ? "bg-white/5 active:bg-white/10 sm:hover:bg-white/10 text-white/70 active:text-white sm:hover:text-white border-white/10 active:border-white/20 sm:hover:border-white/20"
-                    : "bg-green-500/10 active:bg-green-500/20 sm:hover:bg-green-500/20 text-green-400 active:text-green-300 sm:hover:text-green-300 border-green-500/20 active:border-green-500/30 sm:hover:border-green-500/30"
+                    ? "bg-surface active:bg-surface-hover sm:hover:bg-surface-hover text-text-secondary active:text-text-primary sm:hover:text-text-primary border-border-default active:border-border-hover sm:hover:border-border-hover"
+                    : "bg-success/10 active:bg-success/20 sm:hover:bg-success/20 text-success-light active:text-success-lighter sm:hover:text-success-lighter border-success/20 active:border-success/30 sm:hover:border-success/30"
                 )}
               >
                 <svg
