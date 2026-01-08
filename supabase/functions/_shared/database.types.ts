@@ -349,6 +349,51 @@ export type Database = {
           },
         ]
       }
+      user_recommendations: {
+        Row: {
+          id: number
+          user_id: string
+          movie_id: number
+          score: number
+          reason: Json | null
+          generated_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          user_id: string
+          movie_id: number
+          score: number
+          reason?: Json | null
+          generated_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          user_id?: string
+          movie_id?: number
+          score?: number
+          reason?: Json | null
+          generated_at?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_recommendations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_recommendations_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           created_at: string | null

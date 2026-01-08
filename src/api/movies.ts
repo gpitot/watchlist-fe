@@ -287,3 +287,76 @@ export const useUpdateUserProviders = () => {
     },
   });
 };
+
+export type RecommendationResponse = {
+  id: number;
+  movie_id: number;
+  score: number;
+  reason: {
+    matching_cast: string[];
+    matching_crew: string[];
+    matching_production: boolean;
+  };
+  generated_at: string;
+  movies: {
+    id: number;
+    title: string;
+    description: string | null;
+    release_date: string | null;
+    production: string | null;
+    medium: string;
+  };
+};
+
+export const useGetRecommendations = (userId?: string) => {
+  return useQuery({
+    queryKey: ["recommendations", userId],
+    enabled: userId !== undefined,
+    queryFn: async (): Promise<RecommendationResponse[]> => {
+      const { data, error } = await supabase
+        .from("user_recommendations")
+        .select(
+          `
+          *,
+          movies (
+            id,
+            title,
+            description,
+            release_date,
+            production,
+            medium
+          )
+          `
+        )
+        .eq("user_id", userId)
+        .order("score", { ascending: false });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data as RecommendationResponse[];
+    },
+  });
+};
+
+export const useGenerateRecommendations = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke(
+        "generate_recommendations",
+        {
+          method: "POST",
+        }
+      );
+      if (error) {
+        throw error;
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries("recommendations");
+    },
+  });
+};
