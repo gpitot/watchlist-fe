@@ -33,25 +33,40 @@ Deno.serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("Authorization")!;
+
+    // Check if this is a service role call with a specific user ID
+    const scheduledUserId = req.headers.get("x-user-id");
+
     const supabase = createClient<Database>(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    // Get the authenticated user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    let userId: string;
 
-    if (!user) {
-      return new Response("Unauthorized", {
-        status: 401,
-        headers: corsHeaders,
-      });
+    if (scheduledUserId) {
+      // Called by service role with specific user ID (scheduled job)
+      userId = scheduledUserId;
+      console.log(`Scheduled generation for user: ${userId}`);
+    } else {
+      // Called by authenticated user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        return new Response("Unauthorized", {
+          status: 401,
+          headers: corsHeaders,
+        });
+      }
+
+      userId = user.id;
+      console.log(`User-initiated generation for: ${userId}`);
     }
 
-    console.log(`Generating recommendations for user: ${user.id}`);
+    console.log(`Generating recommendations for user: ${userId}`);
 
     // Step 1: Get all movies the user has watched with high ratings
     const { data: likedMovies, error: likedMoviesError } = await supabase
@@ -67,7 +82,7 @@ Deno.serve(async (req) => {
         )
       `
       )
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("watched", true)
       .gte("rating", MIN_RATING_THRESHOLD);
 
@@ -256,7 +271,7 @@ Deno.serve(async (req) => {
     const { data: existingUserMovies } = await supabase
       .from("movies_users")
       .select("movie_id")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .in("movie_id", allCandidateIds);
 
     if (existingUserMovies) {
@@ -279,7 +294,7 @@ Deno.serve(async (req) => {
     await supabase
       .from("user_recommendations")
       .delete()
-      .eq("user_id", user.id);
+      .eq("user_id", userId);
 
     // Then insert new recommendations
     if (topRecommendations.length > 0) {
@@ -287,7 +302,7 @@ Deno.serve(async (req) => {
         .from("user_recommendations")
         .insert(
           topRecommendations.map((rec) => ({
-            user_id: user.id,
+            user_id: userId,
             movie_id: rec.movieId,
             score: rec.score,
             reason: {

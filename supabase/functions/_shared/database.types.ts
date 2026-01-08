@@ -349,6 +349,44 @@ export type Database = {
           },
         ]
       }
+      user_recommendation_status: {
+        Row: {
+          user_id: string
+          last_generated_at: string | null
+          next_scheduled_at: string | null
+          is_processing: boolean | null
+          error_message: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          last_generated_at?: string | null
+          next_scheduled_at?: string | null
+          is_processing?: boolean | null
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          last_generated_at?: string | null
+          next_scheduled_at?: string | null
+          is_processing?: boolean | null
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_recommendation_status_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_recommendations: {
         Row: {
           id: number

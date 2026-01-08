@@ -357,6 +357,37 @@ export const useGenerateRecommendations = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries("recommendations");
+      queryClient.invalidateQueries("recommendation-status");
+    },
+  });
+};
+
+export type RecommendationStatus = {
+  user_id: string;
+  last_generated_at: string | null;
+  next_scheduled_at: string | null;
+  is_processing: boolean | null;
+  error_message: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export const useGetRecommendationStatus = (userId?: string) => {
+  return useQuery({
+    queryKey: ["recommendation-status", userId],
+    enabled: userId !== undefined,
+    queryFn: async (): Promise<RecommendationStatus | null> => {
+      const { data, error } = await supabase
+        .from("user_recommendation_status")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data;
     },
   });
 };

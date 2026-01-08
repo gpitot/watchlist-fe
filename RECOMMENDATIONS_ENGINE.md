@@ -4,6 +4,8 @@
 
 The recommendations engine generates personalized movie and TV show recommendations for users based on their watch history and ratings. It analyzes cast members, crew members, and production companies from movies users have watched and rated highly to find similar content.
 
+**⚙️ Automated Scheduling**: The engine runs automatically on a schedule (hourly by default), processing users in batches without manual intervention. See the [Scheduling](#scheduling-automated-generation) section below.
+
 ## How It Works
 
 ### Algorithm
@@ -63,6 +65,102 @@ The recommendations engine generates personalized movie and TV show recommendati
 **Row Level Security (RLS):**
 - Users can only read their own recommendations
 - Service role can manage all recommendations
+
+**Table: `user_recommendation_status`**
+
+Tracks when recommendations were generated for each user and scheduling information.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| user_id | uuid | Primary key, foreign key to auth.users |
+| last_generated_at | timestamp | Last time recommendations were generated |
+| next_scheduled_at | timestamp | When next generation is scheduled |
+| is_processing | boolean | Whether currently generating recommendations |
+| error_message | text | Last error message if any |
+| created_at | timestamp | Record creation time |
+| updated_at | timestamp | Last update time |
+
+## Scheduling (Automated Generation)
+
+The recommendations engine runs **automatically on a schedule** using PostgreSQL's `pg_cron` extension. By default, it processes up to 10 eligible users every hour.
+
+### How Scheduling Works
+
+1. **Hourly Cron Job**: Runs at the top of every hour (`:00`)
+2. **User Eligibility**: Selects users who:
+   - Have rated movies 4+ stars
+   - Never had recommendations OR last generated 24+ hours ago
+   - Are not currently being processed
+3. **Batch Processing**: Processes up to 10 users per batch to avoid long transactions
+4. **Status Tracking**: Updates `user_recommendation_status` table with results
+
+### Database Functions
+
+**`generate_recommendations_for_user(user_id)`**
+- Generates recommendations for a single user
+- Called by the scheduler or manually
+- Updates status table with results
+
+**`process_scheduled_recommendations()`**
+- Batch processes eligible users
+- Called by pg_cron every hour
+- Returns summary with counts and errors
+
+### Setup
+
+For detailed setup instructions, see **[RECOMMENDATIONS_SETUP.md](./RECOMMENDATIONS_SETUP.md)**
+
+Quick setup checklist:
+1. ✅ Apply database migrations (`supabase db push`)
+2. ✅ Deploy edge function (`supabase functions deploy generate_recommendations`)
+3. ✅ Configure database settings (Supabase URL and service role key)
+4. ✅ Verify pg_cron job is scheduled
+
+### Manual Triggering
+
+You can manually trigger recommendations for a specific user:
+
+```sql
+SELECT public.generate_recommendations_for_user('user-uuid-here');
+```
+
+Or manually run the batch processor:
+
+```sql
+SELECT public.process_scheduled_recommendations();
+```
+
+### Monitoring
+
+Check recommendation generation status:
+
+```sql
+-- View user status
+SELECT * FROM user_recommendation_status WHERE user_id = 'USER_UUID';
+
+-- View recent cron job executions
+SELECT * FROM cron.job_run_details
+WHERE jobname = 'generate-user-recommendations-hourly'
+ORDER BY start_time DESC LIMIT 10;
+```
+
+### Configuration
+
+**Change Schedule Frequency:**
+
+```sql
+-- Run every 6 hours instead of hourly
+SELECT cron.unschedule('generate-user-recommendations-hourly');
+SELECT cron.schedule(
+  'generate-user-recommendations-6hourly',
+  '0 */6 * * *',
+  $$SELECT public.process_scheduled_recommendations();$$
+);
+```
+
+**Adjust Batch Size:**
+
+Edit the `process_scheduled_recommendations()` function and change the `LIMIT` clause.
 
 ## Usage
 
@@ -132,7 +230,7 @@ const MyComponent = () => {
 };
 ```
 
-**2. Generate Recommendations**
+**2. Generate Recommendations (Manual Trigger)**
 
 ```typescript
 import { useGenerateRecommendations } from "api/movies";
@@ -151,7 +249,30 @@ const GenerateButton = () => {
 };
 ```
 
-#### Response Type
+**3. Check Recommendation Status**
+
+```typescript
+import { useGetRecommendationStatus } from "api/movies";
+import { useUserContext } from "providers/user_provider";
+
+const StatusComponent = () => {
+  const { user } = useUserContext();
+  const { data: status } = useGetRecommendationStatus(user?.id);
+
+  if (!status) return <div>No recommendations generated yet</div>;
+
+  return (
+    <div>
+      <p>Last Generated: {new Date(status.last_generated_at).toLocaleString()}</p>
+      <p>Next Scheduled: {status.next_scheduled_at ? new Date(status.next_scheduled_at).toLocaleString() : 'Soon'}</p>
+      {status.is_processing && <p>⏳ Currently generating...</p>}
+      {status.error_message && <p>❌ Error: {status.error_message}</p>}
+    </div>
+  );
+};
+```
+
+#### Response Types
 
 ```typescript
 type RecommendationResponse = {
@@ -173,34 +294,17 @@ type RecommendationResponse = {
     medium: string;
   };
 };
+
+type RecommendationStatus = {
+  user_id: string;
+  last_generated_at: string | null;
+  next_scheduled_at: string | null;
+  is_processing: boolean | null;
+  error_message: string | null;
+  created_at: string;
+  updated_at: string;
+};
 ```
-
-## Scheduling (Future Implementation)
-
-The recommendations engine is designed to be run on a schedule (e.g., daily or weekly) for each user. This can be implemented using:
-
-1. **Supabase Cron Jobs** (pg_cron extension)
-   ```sql
-   SELECT cron.schedule(
-     'generate-recommendations-daily',
-     '0 2 * * *',  -- Run at 2 AM daily
-     $$
-     SELECT net.http_post(
-       'https://your-project.supabase.co/functions/v1/generate_recommendations',
-       body := '{}',
-       headers := '{"Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'
-     );
-     $$
-   );
-   ```
-
-2. **External Scheduler** (Vercel Cron, AWS EventBridge, etc.)
-   - Call the edge function with service role credentials
-   - Iterate through all active users
-
-3. **User-Triggered Updates**
-   - Regenerate when user adds new ratings
-   - Regenerate when user requests fresh recommendations
 
 ## Performance Considerations
 
@@ -322,9 +426,23 @@ supabase db push
 
 ## Files
 
-- **Migration**: `supabase/migrations/20260108000000_create_recommendations_table.sql`
-- **Edge Function**: `supabase/functions/generate_recommendations/index.ts`
-- **API Hooks**: `src/api/movies.ts` (useGetRecommendations, useGenerateRecommendations)
-- **Type Definitions**:
-  - `src/interfaces/database.types.ts`
-  - `supabase/functions/_shared/database.types.ts`
+**Migrations:**
+- `supabase/migrations/20260108000000_create_recommendations_table.sql` - Creates recommendations table
+- `supabase/migrations/20260108000001_setup_recommendations_scheduling.sql` - Sets up scheduling with pg_cron
+
+**Edge Function:**
+- `supabase/functions/generate_recommendations/index.ts` - Recommendation generation logic
+
+**API Hooks:**
+- `src/api/movies.ts`:
+  - `useGetRecommendations(userId)` - Fetch recommendations
+  - `useGenerateRecommendations()` - Trigger manual generation
+  - `useGetRecommendationStatus(userId)` - Check generation status
+
+**Type Definitions:**
+- `src/interfaces/database.types.ts` - Frontend types
+- `supabase/functions/_shared/database.types.ts` - Backend types
+
+**Documentation:**
+- `RECOMMENDATIONS_ENGINE.md` - This file (overview and usage)
+- `RECOMMENDATIONS_SETUP.md` - Detailed setup instructions
