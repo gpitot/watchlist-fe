@@ -2,16 +2,183 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    /* Dark theme (default) */
+    --color-bg-primary: 15 23 42; /* slate-900 */
+    --color-bg-secondary: 88 28 135; /* purple-900 */
+    --color-bg-tertiary: 30 41 59; /* slate-800 */
+
+    --color-surface: 255 255 255;
+    --color-surface-opacity: 0.05;
+    --color-surface-hover-opacity: 0.10;
+
+    --color-primary: 168 85 247; /* purple-500 */
+    --color-primary-light: 192 132 252; /* purple-400 */
+    --color-primary-lighter: 216 180 254; /* purple-300 */
+    --color-primary-dark: 147 51 234; /* purple-600 */
+
+    --color-secondary: 236 72 153; /* pink-500 */
+    --color-secondary-light: 244 114 182; /* pink-400 */
+
+    --color-success: 34 197 94; /* green-500 */
+    --color-success-light: 74 222 128; /* green-400 */
+    --color-success-lighter: 134 239 172; /* green-300 */
+
+    --color-error: 239 68 68; /* red-500 */
+    --color-error-light: 248 113 113; /* red-400 */
+    --color-error-lighter: 252 165 165; /* red-300 */
+
+    --color-text-primary: 255 255 255;
+    --color-text-secondary: 255 255 255;
+    --color-text-secondary-opacity: 0.60;
+    --color-text-tertiary: 255 255 255;
+    --color-text-tertiary-opacity: 0.40;
+    --color-text-muted: 255 255 255;
+    --color-text-muted-opacity: 0.30;
+
+    --color-border: 255 255 255;
+    --color-border-opacity: 0.10;
+    --color-border-hover-opacity: 0.20;
+
+    --shadow-color: 168 85 247; /* purple-500 */
+  }
+
+  [data-theme="light"] {
+    /* Light theme */
+    --color-bg-primary: 248 250 252; /* slate-50 */
+    --color-bg-secondary: 243 232 255; /* purple-100 */
+    --color-bg-tertiary: 241 245 249; /* slate-100 */
+
+    --color-surface: 15 23 42;
+    --color-surface-opacity: 0.03;
+    --color-surface-hover-opacity: 0.06;
+
+    --color-primary: 147 51 234; /* purple-600 */
+    --color-primary-light: 168 85 247; /* purple-500 */
+    --color-primary-lighter: 192 132 252; /* purple-400 */
+    --color-primary-dark: 126 34 206; /* purple-700 */
+
+    --color-secondary: 219 39 119; /* pink-600 */
+    --color-secondary-light: 236 72 153; /* pink-500 */
+
+    --color-success: 22 163 74; /* green-600 */
+    --color-success-light: 34 197 94; /* green-500 */
+    --color-success-lighter: 74 222 128; /* green-400 */
+
+    --color-error: 220 38 38; /* red-600 */
+    --color-error-light: 239 68 68; /* red-500 */
+    --color-error-lighter: 248 113 113; /* red-400 */
+
+    --color-text-primary: 15 23 42; /* slate-900 */
+    --color-text-secondary: 51 65 85; /* slate-700 */
+    --color-text-secondary-opacity: 1;
+    --color-text-tertiary: 100 116 139; /* slate-500 */
+    --color-text-tertiary-opacity: 1;
+    --color-text-muted: 148 163 184; /* slate-400 */
+    --color-text-muted-opacity: 1;
+
+    --color-border: 15 23 42;
+    --color-border-opacity: 0.10;
+    --color-border-hover-opacity: 0.20;
+
+    --shadow-color: 147 51 234; /* purple-600 */
+  }
+
+  [data-theme="sunset"] {
+    /* Sunset theme - warm orange/red palette */
+    --color-bg-primary: 23 23 23; /* neutral-900 */
+    --color-bg-secondary: 124 45 18; /* orange-900 */
+    --color-bg-tertiary: 38 38 38; /* neutral-800 */
+
+    --color-surface: 255 255 255;
+    --color-surface-opacity: 0.05;
+    --color-surface-hover-opacity: 0.10;
+
+    --color-primary: 249 115 22; /* orange-500 */
+    --color-primary-light: 251 146 60; /* orange-400 */
+    --color-primary-lighter: 253 186 116; /* orange-300 */
+    --color-primary-dark: 234 88 12; /* orange-600 */
+
+    --color-secondary: 239 68 68; /* red-500 */
+    --color-secondary-light: 248 113 113; /* red-400 */
+
+    --color-success: 34 197 94; /* green-500 */
+    --color-success-light: 74 222 128; /* green-400 */
+    --color-success-lighter: 134 239 172; /* green-300 */
+
+    --color-error: 220 38 38; /* red-600 */
+    --color-error-light: 239 68 68; /* red-500 */
+    --color-error-lighter: 248 113 113; /* red-400 */
+
+    --color-text-primary: 255 255 255;
+    --color-text-secondary: 255 255 255;
+    --color-text-secondary-opacity: 0.60;
+    --color-text-tertiary: 255 255 255;
+    --color-text-tertiary-opacity: 0.40;
+    --color-text-muted: 255 255 255;
+    --color-text-muted-opacity: 0.30;
+
+    --color-border: 255 255 255;
+    --color-border-opacity: 0.10;
+    --color-border-hover-opacity: 0.20;
+
+    --shadow-color: 249 115 22; /* orange-500 */
+  }
+
+  [data-theme="ocean"] {
+    /* Ocean theme - blue/teal palette */
+    --color-bg-primary: 12 74 110; /* sky-900 */
+    --color-bg-secondary: 22 78 99; /* cyan-900 */
+    --color-bg-tertiary: 7 89 133; /* sky-800 */
+
+    --color-surface: 255 255 255;
+    --color-surface-opacity: 0.05;
+    --color-surface-hover-opacity: 0.10;
+
+    --color-primary: 14 165 233; /* sky-500 */
+    --color-primary-light: 56 189 248; /* sky-400 */
+    --color-primary-lighter: 125 211 252; /* sky-300 */
+    --color-primary-dark: 2 132 199; /* sky-600 */
+
+    --color-secondary: 6 182 212; /* cyan-500 */
+    --color-secondary-light: 34 211 238; /* cyan-400 */
+
+    --color-success: 34 197 94; /* green-500 */
+    --color-success-light: 74 222 128; /* green-400 */
+    --color-success-lighter: 134 239 172; /* green-300 */
+
+    --color-error: 239 68 68; /* red-500 */
+    --color-error-light: 248 113 113; /* red-400 */
+    --color-error-lighter: 252 165 165; /* red-300 */
+
+    --color-text-primary: 255 255 255;
+    --color-text-secondary: 255 255 255;
+    --color-text-secondary-opacity: 0.60;
+    --color-text-tertiary: 255 255 255;
+    --color-text-tertiary-opacity: 0.40;
+    --color-text-muted: 255 255 255;
+    --color-text-muted-opacity: 0.30;
+
+    --color-border: 255 255 255;
+    --color-border-opacity: 0.10;
+    --color-border-hover-opacity: 0.20;
+
+    --shadow-color: 14 165 233; /* sky-500 */
+  }
+}
+
 th,
 td,
 tr {
   padding: 15px;
-  border: solid 1px black;
+  border: solid 1px rgb(var(--color-border) / var(--color-border-opacity));
 }
 
 th {
   position: sticky;
   top: 0px; /* 0px if you don't have a navbar, but something is required */
-  background: lightgray;
-  border-bottom: solid 1px black;
+  background: rgb(var(--color-bg-tertiary));
+  border-bottom: solid 1px rgb(var(--color-border) / var(--color-border-hover-opacity));
+  color: rgb(var(--color-text-primary));
 }

@@ -44,10 +44,10 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-primary flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg shadow-purple-500/25 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-accent shadow-primary-lg mb-4">
             <svg
               className="w-8 h-8 text-white"
               fill="none"
@@ -62,17 +62,17 @@ export const LoginForm: React.FC = () => {
               />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Watchlist</h1>
-          <p className="text-white/50">Track your movies and shows</p>
+          <h1 className="text-3xl font-bold text-text-primary mb-2">Watchlist</h1>
+          <p className="text-text-tertiary">Track your movies and shows</p>
         </div>
 
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl shadow-purple-500/10">
-          <h2 className="text-xl font-semibold text-white mb-6 text-center">
+        <div className="bg-surface backdrop-blur-xl border border-border-default rounded-2xl p-8 shadow-primary-lg">
+          <h2 className="text-xl font-semibold text-text-primary mb-6 text-center">
             Sign in to continue
           </h2>
 
           {error && (
-            <div className="mb-6 text-sm text-red-300 bg-red-500/10 border border-red-500/20 p-3 rounded-xl">
+            <div className="mb-6 text-sm text-error-lighter bg-error/10 border border-error/20 p-3 rounded-xl">
               {error}
             </div>
           )}
@@ -113,20 +113,20 @@ export const LoginForm: React.FC = () => {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10"></div>
+              <div className="w-full border-t border-border-default"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white/5 text-white/40">or</span>
+              <span className="px-2 bg-surface text-text-tertiary">or</span>
             </div>
           </div>
 
           <button
             onClick={handleAnonymousLogin}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/5 hover:bg-white/10 text-white/90 font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-white/10"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-surface hover:bg-surface-hover text-text-primary font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-border-default"
           >
             {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-border-default border-t-text-primary rounded-full animate-spin" />
             ) : (
               <svg
                 className="w-5 h-5"
@@ -145,7 +145,7 @@ export const LoginForm: React.FC = () => {
             Try without account
           </button>
 
-          <p className="mt-6 text-center text-white/30 text-xs">
+          <p className="mt-6 text-center text-text-muted text-xs">
             By signing in, you agree to our terms of service
           </p>
         </div>

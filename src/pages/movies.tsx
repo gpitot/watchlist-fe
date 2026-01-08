@@ -29,7 +29,7 @@ const getMovieState = (
 const StateIndicator: React.FC<{ state: MovieState }> = ({ state }) => {
   if (state === "watched") {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary-lighter border border-primary/30">
         <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
           <path
             fillRule="evenodd"
@@ -43,16 +43,16 @@ const StateIndicator: React.FC<{ state: MovieState }> = ({ state }) => {
   }
   if (state === "available") {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-500/30">
-        <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-success/20 text-success-lighter border border-success/30">
+        <span className="w-1.5 h-1.5 rounded-full bg-success-light" />
         Available
       </span>
     );
   }
   if (state === "unavailable") {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-white/10 text-white/50 border border-white/20">
-        <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-surface text-text-tertiary border border-border-hover">
+        <span className="w-1.5 h-1.5 rounded-full bg-text-tertiary" />
         Not available
       </span>
     );
@@ -73,12 +73,12 @@ const MovieCard: React.FC<{
       onClick={onClick}
       className={classNames(
         "w-full text-left p-3 sm:p-4 rounded-xl border transition-all duration-200",
-        "hover:bg-white/10 hover:border-white/20 hover:shadow-lg hover:shadow-purple-500/5",
-        "focus:outline-none focus:ring-2 focus:ring-purple-500/50 active:scale-[0.98]",
+        "hover:bg-surface-hover hover:border-border-hover hover:shadow-lg hover:shadow-primary-sm",
+        "focus:outline-none focus:ring-2 focus:ring-primary/50 active:scale-[0.98]",
         {
-          "bg-white/5 border-white/10": state === "unavailable",
-          "bg-green-500/5 border-green-500/20": state === "available",
-          "bg-purple-500/5 border-purple-500/20 opacity-75": state === "watched",
+          "bg-surface border-border-default": state === "unavailable",
+          "bg-success/5 border-success/20": state === "available",
+          "bg-primary/5 border-primary/20 opacity-75": state === "watched",
         }
       )}
     >
@@ -89,13 +89,13 @@ const MovieCard: React.FC<{
               <h3
                 className={classNames(
                   "font-medium text-base sm:text-lg",
-                  state === "watched" ? "text-white/60" : "text-white"
+                  state === "watched" ? "text-text-secondary" : "text-text-primary"
                 )}
               >
                 {movie.title}
               </h3>
               {year && (
-                <span className="text-white/40 text-sm flex-shrink-0">({year})</span>
+                <span className="text-text-tertiary text-sm flex-shrink-0">({year})</span>
               )}
             </div>
             <StateIndicator state={state} />
@@ -109,7 +109,7 @@ const MovieCard: React.FC<{
         </div>
 
         {genres && (
-          <p className="text-white/40 text-sm line-clamp-1">{genres}</p>
+          <p className="text-text-tertiary text-sm line-clamp-1">{genres}</p>
         )}
       </div>
     </button>
@@ -167,9 +167,9 @@ const TableUI: React.FC<{
 
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          <h2 className="text-lg md:text-xl font-medium text-white">
+          <h2 className="text-lg md:text-xl font-medium text-text-primary">
             Your Watchlist
-            <span className="text-white/40 font-normal ml-2">
+            <span className="text-text-tertiary font-normal ml-2">
               ({filteredData.length} {filteredData.length === 1 ? "title" : "titles"})
             </span>
           </h2>
@@ -180,11 +180,11 @@ const TableUI: React.FC<{
                 className={classNames(
                   "flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all whitespace-nowrap flex-shrink-0",
                   filter === "available"
-                    ? "bg-green-500/20 border-green-500/40 text-green-300"
-                    : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white/70"
+                    ? "bg-success/20 border-success/40 text-success-lighter"
+                    : "bg-surface border-border-default text-text-tertiary hover:bg-surface-hover hover:text-text-secondary"
                 )}
               >
-                <span className="w-2 h-2 rounded-full bg-green-400" />
+                <span className="w-2 h-2 rounded-full bg-success-light" />
                 {availableCount} available
               </button>
             )}
@@ -194,11 +194,11 @@ const TableUI: React.FC<{
                 className={classNames(
                   "flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all whitespace-nowrap flex-shrink-0",
                   filter === "unavailable"
-                    ? "bg-white/20 border-white/30 text-white/70"
-                    : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white/70"
+                    ? "bg-surface-hover border-border-hover text-text-secondary"
+                    : "bg-surface border-border-default text-text-tertiary hover:bg-surface-hover hover:text-text-secondary"
                 )}
               >
-                <span className="w-2 h-2 rounded-full bg-white/40" />
+                <span className="w-2 h-2 rounded-full bg-text-tertiary" />
                 {unavailableCount} not available
               </button>
             )}
@@ -208,8 +208,8 @@ const TableUI: React.FC<{
                 className={classNames(
                   "flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all whitespace-nowrap flex-shrink-0",
                   filter === "watched"
-                    ? "bg-purple-500/20 border-purple-500/40 text-purple-300"
-                    : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white/70"
+                    ? "bg-primary/20 border-primary/40 text-primary-lighter"
+                    : "bg-surface border-border-default text-text-tertiary hover:bg-surface-hover hover:text-text-secondary"
                 )}
               >
                 <svg
@@ -230,16 +230,16 @@ const TableUI: React.FC<{
         </div>
 
         {data.length === 0 ? (
-          <div className="text-center py-12 px-4 text-white/40">
+          <div className="text-center py-12 px-4 text-text-tertiary">
             <p className="text-base">Your watchlist is empty</p>
             <p className="text-sm mt-1">Add movies or shows to get started</p>
           </div>
         ) : filteredData.length === 0 ? (
-          <div className="text-center py-12 px-4 text-white/40">
+          <div className="text-center py-12 px-4 text-text-tertiary">
             <p className="text-base">No movies match this filter</p>
             <button
               onClick={() => setFilter("all")}
-              className="text-sm mt-2 text-purple-400 hover:text-purple-300 underline active:text-purple-200"
+              className="text-sm mt-2 text-primary-light hover:text-primary-lighter underline active:text-primary"
             >
               Clear filter
             </button>

@@ -1,6 +1,7 @@
 import { MultiSelect } from "components/multi_select";
 import { AddMovie } from "pages/add-movie";
 import { Movies } from "pages/movies";
+import { ThemeSwitcher } from "components/theme_switcher";
 import { useUserContext } from "providers/user_provider";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import {
@@ -98,10 +99,10 @@ export const Homepage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-primary flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-purple-400 border-t-transparent rounded-full animate-spin" />
-          <p className="text-white/70 text-lg">Loading your watchlist...</p>
+          <div className="w-12 h-12 border-4 border-primary-light border-t-transparent rounded-full animate-spin" />
+          <p className="text-text-secondary text-lg">Loading your watchlist...</p>
         </div>
       </div>
     );
@@ -109,10 +110,10 @@ export const Homepage: React.FC = () => {
 
   if (isError || !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
-        <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-8 text-center">
-          <p className="text-red-400 text-lg">Something went wrong</p>
-          <p className="text-white/50 mt-2">Please try again later</p>
+      <div className="min-h-screen bg-gradient-primary flex items-center justify-center">
+        <div className="bg-error/10 border border-error/20 rounded-2xl p-8 text-center">
+          <p className="text-error-light text-lg">Something went wrong</p>
+          <p className="text-text-tertiary mt-2">Please try again later</p>
         </div>
       </div>
     );
@@ -125,12 +126,12 @@ export const Homepage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-slate-900/70 border-b border-white/10">
+    <div className="min-h-screen bg-gradient-primary">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-bg-primary/70 border-b border-border-default">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
             <Link to="/" className="group flex items-center gap-2 sm:gap-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:shadow-purple-500/40 transition-shadow">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-accent flex items-center justify-center shadow-primary shadow-lg group-hover:shadow-primary-lg transition-shadow">
                 <svg
                   className="w-4 h-4 sm:w-5 sm:h-5 text-white"
                   fill="none"
@@ -145,16 +146,17 @@ export const Homepage: React.FC = () => {
                   />
                 </svg>
               </div>
-              <h1 className="text-lg sm:text-xl font-semibold text-white group-hover:text-purple-300 transition-colors">
+              <h1 className="text-lg sm:text-xl font-semibold text-text-primary group-hover:text-primary-lighter transition-colors">
                 Watchlist
               </h1>
             </Link>
 
             {isLoggedIn && !isSharing && (
               <div className="flex items-center gap-1.5 sm:gap-2">
+                <ThemeSwitcher />
                 <button
                   onClick={copyShareLink}
-                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/80 hover:text-white transition-all text-sm font-medium active:scale-95"
+                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-surface hover:bg-surface-hover border border-border-default hover:border-border-hover text-text-secondary hover:text-text-primary transition-all text-sm font-medium active:scale-95"
                 >
                   <svg
                     className="w-3.5 h-3.5 sm:w-4 sm:h-4"
@@ -173,7 +175,7 @@ export const Homepage: React.FC = () => {
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/80 hover:text-white transition-all text-sm font-medium active:scale-95"
+                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-surface hover:bg-surface-hover border border-border-default hover:border-border-hover text-text-secondary hover:text-text-primary transition-all text-sm font-medium active:scale-95"
                 >
                   <svg
                     className="w-3.5 h-3.5 sm:w-4 sm:h-4"
@@ -197,13 +199,13 @@ export const Homepage: React.FC = () => {
       </header>
 
       {isLoggedIn && isAnonymous && !isSharing && (
-        <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-b border-purple-500/30">
+        <div className="bg-gradient-to-r from-primary/20 to-secondary/20 border-b border-primary/30">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                   <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5 text-purple-300"
+                    className="w-4 h-4 sm:w-5 sm:h-5 text-primary-lighter"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -217,10 +219,10 @@ export const Homepage: React.FC = () => {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-white font-medium text-sm sm:text-base">
+                  <p className="text-text-primary font-medium text-sm sm:text-base">
                     You're using a temporary account
                   </p>
-                  <p className="text-white/60 text-xs sm:text-sm">
+                  <p className="text-text-secondary text-xs sm:text-sm">
                     Save your watchlist permanently by creating an account
                   </p>
                 </div>
@@ -261,13 +263,13 @@ export const Homepage: React.FC = () => {
 
       <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         {isLoggedIn && !isSharing && (
-          <div className="mb-6 sm:mb-8 p-4 sm:p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
+          <div className="mb-6 sm:mb-8 p-4 sm:p-6 rounded-2xl bg-surface backdrop-blur-sm border border-border-default">
             <div className="flex flex-col lg:flex-row lg:items-center gap-4">
               <div className="flex-1">
                 <AddMovie />
               </div>
               <div className="lg:w-80">
-                <label className="block text-sm font-medium text-white/60 mb-2">
+                <label className="block text-sm font-medium text-text-secondary mb-2">
                   Streaming Services
                 </label>
                 <MultiSelect
@@ -282,8 +284,8 @@ export const Homepage: React.FC = () => {
         )}
 
         {isSharing && (
-          <div className="mb-8 p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-center">
-            <p className="text-purple-300 text-sm">
+          <div className="mb-8 p-4 rounded-xl bg-primary/10 border border-primary/20 text-center">
+            <p className="text-primary-lighter text-sm">
               You're viewing a shared watchlist
             </p>
           </div>
