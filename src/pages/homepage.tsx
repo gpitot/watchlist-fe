@@ -127,12 +127,12 @@ export const Homepage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-slate-900/70 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="group flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:shadow-purple-500/40 transition-shadow">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
+            <Link to="/" className="group flex items-center gap-2 sm:gap-3">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:shadow-purple-500/40 transition-shadow">
                 <svg
-                  className="w-5 h-5 text-white"
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -145,19 +145,19 @@ export const Homepage: React.FC = () => {
                   />
                 </svg>
               </div>
-              <h1 className="text-xl font-semibold text-white group-hover:text-purple-300 transition-colors">
+              <h1 className="text-lg sm:text-xl font-semibold text-white group-hover:text-purple-300 transition-colors">
                 Watchlist
               </h1>
             </Link>
 
             {isLoggedIn && !isSharing && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
                   onClick={copyShareLink}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/80 hover:text-white transition-all text-sm font-medium"
+                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/80 hover:text-white transition-all text-sm font-medium active:scale-95"
                 >
                   <svg
-                    className="w-4 h-4"
+                    className="w-3.5 h-3.5 sm:w-4 sm:h-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -169,14 +169,14 @@ export const Homepage: React.FC = () => {
                       d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
                     />
                   </svg>
-                  Share
+                  <span className="hidden xs:inline">Share</span>
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/80 hover:text-white transition-all text-sm font-medium"
+                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/80 hover:text-white transition-all text-sm font-medium active:scale-95"
                 >
                   <svg
-                    className="w-4 h-4"
+                    className="w-3.5 h-3.5 sm:w-4 sm:h-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -188,7 +188,7 @@ export const Homepage: React.FC = () => {
                       d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                     />
                   </svg>
-                  Logout
+                  <span className="hidden xs:inline">Logout</span>
                 </button>
               </div>
             )}
@@ -198,12 +198,12 @@ export const Homepage: React.FC = () => {
 
       {isLoggedIn && isAnonymous && !isSharing && (
         <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-b border-purple-500/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-500/20 flex items-center justify-center flex-shrink-0">
                   <svg
-                    className="w-5 h-5 text-purple-300"
+                    className="w-4 h-4 sm:w-5 sm:h-5 text-purple-300"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -217,17 +217,17 @@ export const Homepage: React.FC = () => {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-white font-medium">
+                  <p className="text-white font-medium text-sm sm:text-base">
                     You're using a temporary account
                   </p>
-                  <p className="text-white/60 text-sm">
+                  <p className="text-white/60 text-xs sm:text-sm">
                     Save your watchlist permanently by creating an account
                   </p>
                 </div>
               </div>
               <button
                 onClick={handleConvertToPermanent}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-gray-100 text-slate-800 font-medium transition-all shadow-lg whitespace-nowrap"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-white hover:bg-gray-100 text-slate-800 font-medium transition-all shadow-lg whitespace-nowrap text-sm active:scale-95"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -251,16 +251,17 @@ export const Homepage: React.FC = () => {
                     d="M24 47c6.5 0 12-2.1 16-5.7l-7.3-5.7c-2.2 1.5-5 2.4-8.7 2.4-6.7 0-12.4-4.5-14.4-10.5l-7.3 5.7C6.1 41.1 14 47 24 47z"
                   />
                 </svg>
-                Create Account with Google
+                <span className="hidden xs:inline">Create Account with Google</span>
+                <span className="xs:hidden">Sign Up</span>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         {isLoggedIn && !isSharing && (
-          <div className="mb-8 p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
+          <div className="mb-6 sm:mb-8 p-4 sm:p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
             <div className="flex flex-col lg:flex-row lg:items-center gap-4">
               <div className="flex-1">
                 <AddMovie />
