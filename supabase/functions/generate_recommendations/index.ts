@@ -32,39 +32,25 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const authHeader = req.headers.get("Authorization")!;
+    // Only accept service role calls with x-user-id header
+    const userId = req.headers.get("x-user-id");
 
-    // Check if this is a service role call with a specific user ID
-    const scheduledUserId = req.headers.get("x-user-id");
+    if (!userId) {
+      return new Response(
+        JSON.stringify({
+          error: "This endpoint is only accessible via scheduled jobs. Missing x-user-id header."
+        }),
+        {
+          status: 403,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
 
     const supabase = createClient<Database>(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
-
-    let userId: string;
-
-    if (scheduledUserId) {
-      // Called by service role with specific user ID (scheduled job)
-      userId = scheduledUserId;
-      console.log(`Scheduled generation for user: ${userId}`);
-    } else {
-      // Called by authenticated user
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        return new Response("Unauthorized", {
-          status: 401,
-          headers: corsHeaders,
-        });
-      }
-
-      userId = user.id;
-      console.log(`User-initiated generation for: ${userId}`);
-    }
 
     console.log(`Generating recommendations for user: ${userId}`);
 

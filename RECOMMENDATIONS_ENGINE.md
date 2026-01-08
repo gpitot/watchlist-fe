@@ -170,30 +170,11 @@ Edit the `process_scheduled_recommendations()` function and change the `LIMIT` c
 
 **Function**: `generate_recommendations`
 
-**Endpoint**: `POST /functions/v1/generate_recommendations`
+**Access**: Internal only - called by scheduled database functions
 
-**Authentication**: Requires valid user JWT token
+**Authentication**: Requires service role key + `x-user-id` header
 
-**Request**: No body required (uses authenticated user ID)
-
-**Response**:
-```json
-{
-  "message": "Recommendations generated successfully",
-  "count": 20,
-  "recommendations": [
-    {
-      "movieId": 123,
-      "score": 15.5,
-      "matches": {
-        "cast": ["Actor A", "Actor B"],
-        "crew": ["Director C"],
-        "production": true
-      }
-    }
-  ]
-}
-```
+**Note**: This endpoint is **not accessible** to end users. It can only be called by the database scheduler via the `generate_recommendations_for_user()` function.
 
 **Configuration:**
 - `MIN_RATING_THRESHOLD`: 4 (minimum rating to consider a movie as "liked")
@@ -230,26 +211,7 @@ const MyComponent = () => {
 };
 ```
 
-**2. Generate Recommendations (Manual Trigger)**
-
-```typescript
-import { useGenerateRecommendations } from "api/movies";
-
-const GenerateButton = () => {
-  const { mutate, isLoading } = useGenerateRecommendations();
-
-  return (
-    <button
-      onClick={() => mutate()}
-      disabled={isLoading}
-    >
-      {isLoading ? "Generating..." : "Generate Recommendations"}
-    </button>
-  );
-};
-```
-
-**3. Check Recommendation Status**
+**2. Check Recommendation Status**
 
 ```typescript
 import { useGetRecommendationStatus } from "api/movies";
@@ -436,7 +398,6 @@ supabase db push
 **API Hooks:**
 - `src/api/movies.ts`:
   - `useGetRecommendations(userId)` - Fetch recommendations
-  - `useGenerateRecommendations()` - Trigger manual generation
   - `useGetRecommendationStatus(userId)` - Check generation status
 
 **Type Definitions:**

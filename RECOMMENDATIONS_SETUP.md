@@ -390,7 +390,7 @@ SELECT cron.schedule(
 
 1. **Service Role Key**: Store securely in database settings, never commit to git
 2. **RLS Policies**: Ensure user_recommendations and user_recommendation_status have proper RLS
-3. **Rate Limiting**: Consider adding rate limiting if allowing manual triggers from frontend
+3. **Access Control**: Edge function only accepts calls with x-user-id header (service role only)
 4. **Monitoring**: Regularly check error messages for security issues
 
 ## Next Steps
@@ -400,8 +400,7 @@ After setup is complete:
 1. ✅ Monitor the first few cron job executions
 2. ✅ Check recommendation quality for test users
 3. ✅ Adjust scheduling frequency based on user activity
-4. ✅ Consider adding a UI for users to manually trigger updates
-5. ✅ Implement notification when new recommendations are available
+4. ✅ Implement notification when new recommendations are available
 
 ## Support
 

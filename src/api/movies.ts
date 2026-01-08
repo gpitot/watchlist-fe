@@ -340,28 +340,6 @@ export const useGetRecommendations = (userId?: string) => {
   });
 };
 
-export const useGenerateRecommendations = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.functions.invoke(
-        "generate_recommendations",
-        {
-          method: "POST",
-        }
-      );
-      if (error) {
-        throw error;
-      }
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries("recommendations");
-      queryClient.invalidateQueries("recommendation-status");
-    },
-  });
-};
-
 export type RecommendationStatus = {
   user_id: string;
   last_generated_at: string | null;
