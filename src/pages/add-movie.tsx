@@ -5,7 +5,7 @@ import { debounce } from "lodash-es";
 
 const Result: React.FC<{
   item: Stream;
-  handleAdd: (body: { id: number; medium: string }) => void;
+  handleAdd: (body: { id: number; medium: string; streamData: Stream }) => void;
 }> = ({ item, handleAdd }) => {
   const year = item.release_date ? item.release_date.slice(0, 4) : null;
   const isTV = item.medium === "tv";
@@ -13,7 +13,9 @@ const Result: React.FC<{
   return (
     <button
       className="w-full flex items-center gap-3 p-3 hover:bg-white/10 transition-colors text-left"
-      onClick={() => handleAdd({ id: item.id, medium: item.medium })}
+      onClick={() =>
+        handleAdd({ id: item.id, medium: item.medium, streamData: item })
+      }
     >
       {item.poster_path ? (
         <img
@@ -76,7 +78,7 @@ const Results: React.FC<{
     movies: Stream[];
     tvs: Stream[];
   } | null;
-  handleAdd: (body: { id: number; medium: string }) => void;
+  handleAdd: (body: { id: number; medium: string; streamData: Stream }) => void;
 }> = ({ data, handleAdd }) => {
   if (!data) {
     return null;
@@ -135,7 +137,11 @@ const AddMovie: React.FC = () => {
 
   const [title, setTitle] = useState("");
 
-  const handleAdd = (body: { id: number; medium: string }) => {
+  const handleAdd = (body: {
+    id: number;
+    medium: string;
+    streamData: Stream;
+  }) => {
     add(body);
     setTitle("");
   };

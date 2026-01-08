@@ -113,10 +113,14 @@ export const useSearchStreams = () => {
 export const useAddMovie = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    async (body: { id: number; medium: string }): Promise<void> => {
+    async (body: {
+      id: number;
+      medium: string;
+      streamData?: Stream;
+    }): Promise<void> => {
       const { data, error } = await supabase.functions.invoke("add_movie", {
         method: "POST",
-        body: JSON.stringify(body),
+        body: JSON.stringify({ id: body.id, medium: body.medium }),
       });
       if (error) {
         throw error;
@@ -124,7 +128,57 @@ export const useAddMovie = () => {
       return data;
     },
     {
-      onSuccess: async () => {
+      onMutate: async (
+        newMovie: { id: number; medium: string; streamData?: Stream }
+      ) => {
+        // Cancel any outgoing refetches to avoid overwriting our optimistic update
+        await queryClient.cancelQueries("movies");
+
+        // Snapshot the previous value
+        const previousMovies = queryClient.getQueryData<{
+          movies: MovieDetailsResponse[];
+        }>("movies");
+
+        // Optimistically update to the new value if we have stream data
+        if (newMovie.streamData && previousMovies) {
+          const optimisticMovie: MovieDetailsResponse = {
+            id: newMovie.streamData.id,
+            title: newMovie.streamData.name,
+            created_at: new Date().toISOString(),
+            description: null,
+            release_date: newMovie.streamData.release_date || null,
+            production: newMovie.streamData.poster_path || null,
+            watched: false,
+            rating: null,
+            medium: newMovie.streamData.medium,
+            movies_genres: [],
+            movie_credits: [],
+            movie_providers: [],
+          };
+
+          queryClient.setQueryData<{ movies: MovieDetailsResponse[] }>(
+            "movies",
+            {
+              movies: [optimisticMovie, ...previousMovies.movies],
+            }
+          );
+        }
+
+        // Return a context object with the snapshotted value
+        return { previousMovies };
+      },
+      onError: (
+        _err: unknown,
+        _newMovie: { id: number; medium: string; streamData?: Stream },
+        context?: { previousMovies?: { movies: MovieDetailsResponse[] } }
+      ) => {
+        // If the mutation fails, use the context returned from onMutate to roll back
+        if (context?.previousMovies) {
+          queryClient.setQueryData("movies", context.previousMovies);
+        }
+      },
+      onSettled: () => {
+        // Always refetch after error or success to ensure we have the correct server state
         queryClient.invalidateQueries("movies");
       },
     }
