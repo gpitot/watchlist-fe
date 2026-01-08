@@ -349,6 +349,89 @@ export type Database = {
           },
         ]
       }
+      user_recommendation_status: {
+        Row: {
+          user_id: string
+          last_generated_at: string | null
+          next_scheduled_at: string | null
+          is_processing: boolean | null
+          error_message: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          last_generated_at?: string | null
+          next_scheduled_at?: string | null
+          is_processing?: boolean | null
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          last_generated_at?: string | null
+          next_scheduled_at?: string | null
+          is_processing?: boolean | null
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_recommendation_status_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_recommendations: {
+        Row: {
+          id: number
+          user_id: string
+          movie_id: number
+          score: number
+          reason: Json | null
+          generated_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          user_id: string
+          movie_id: number
+          score: number
+          reason?: Json | null
+          generated_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          user_id?: string
+          movie_id?: number
+          score?: number
+          reason?: Json | null
+          generated_at?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_recommendations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_recommendations_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: false
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           created_at: string | null

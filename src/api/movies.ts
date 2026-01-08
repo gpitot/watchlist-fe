@@ -341,3 +341,85 @@ export const useUpdateUserProviders = () => {
     },
   });
 };
+
+export type RecommendationResponse = {
+  id: number;
+  movie_id: number;
+  score: number;
+  reason: {
+    matching_cast: string[];
+    matching_crew: string[];
+    matching_production: boolean;
+  };
+  generated_at: string;
+  movies: {
+    id: number;
+    title: string;
+    description: string | null;
+    release_date: string | null;
+    production: string | null;
+    medium: string;
+  };
+};
+
+export const useGetRecommendations = (userId?: string) => {
+  return useQuery({
+    queryKey: ["recommendations", userId],
+    enabled: userId !== undefined,
+    queryFn: async (): Promise<RecommendationResponse[]> => {
+      const { data, error } = await supabase
+        .from("user_recommendations")
+        .select(
+          `
+          *,
+          movies (
+            id,
+            title,
+            description,
+            release_date,
+            production,
+            medium
+          )
+          `
+        )
+        .eq("user_id", userId)
+        .order("score", { ascending: false });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data as RecommendationResponse[];
+    },
+  });
+};
+
+export type RecommendationStatus = {
+  user_id: string;
+  last_generated_at: string | null;
+  next_scheduled_at: string | null;
+  is_processing: boolean | null;
+  error_message: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export const useGetRecommendationStatus = (userId?: string) => {
+  return useQuery({
+    queryKey: ["recommendation-status", userId],
+    enabled: userId !== undefined,
+    queryFn: async (): Promise<RecommendationStatus | null> => {
+      const { data, error } = await supabase
+        .from("user_recommendation_status")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data;
+    },
+  });
+};
