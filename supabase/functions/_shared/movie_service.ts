@@ -48,6 +48,7 @@ export const isMedium = (medium: string): medium is Medium => {
   return medium === "movie" || medium === "tv";
 };
 export type Medium = "movie" | "tv";
+export type TimeWindow = "day" | "week";
 export class MovieAndShowService {
   private AUTH_TOKEN: string;
 
@@ -173,6 +174,40 @@ export class MovieAndShowService {
         name: r.name ?? r.title,
         poster_path: this.getFullPosterPath(r.backdrop_path),
         release_date: r.release_date,
+        medium: type,
+      };
+    });
+  }
+
+  public async getTrending(
+    type: Medium,
+    timeWindow: TimeWindow = "week"
+  ): Promise<
+    {
+      id: number;
+      name: string;
+      poster_path?: string;
+      release_date?: string;
+      medium: Medium;
+    }[]
+  > {
+    const res = await this.myfetch<{
+      results: {
+        id: number;
+        name?: string;
+        title?: string;
+        poster_path?: string | null;
+        release_date?: string;
+        first_air_date?: string;
+      }[];
+    }>(`/trending/${type}/${timeWindow}`);
+
+    return res.results.map((r) => {
+      return {
+        id: r.id,
+        name: r.name ?? r.title ?? "",
+        poster_path: this.getFullPosterPath(r.poster_path),
+        release_date: r.release_date ?? r.first_air_date,
         medium: type,
       };
     });

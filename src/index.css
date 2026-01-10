@@ -182,3 +182,13 @@ th {
   border-bottom: solid 1px rgb(var(--color-border) / var(--color-border-hover-opacity));
   color: rgb(var(--color-text-primary));
 }
+
+/* Hide scrollbar for horizontal scroll areas */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
