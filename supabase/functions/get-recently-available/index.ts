@@ -2,6 +2,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { Database } from "../_shared/database.types.ts";
 import { createClient } from "supabase";
 import type { SendData } from "../_shared/email.ts";
+import { checkCronAuth } from "../_shared/cron-auth.ts";
 
 const adminClient = createClient<Database>(
   Deno.env.get("SUPABASE_URL") ?? "",
@@ -14,6 +15,14 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
+
+  if (!checkCronAuth(req)) {
+    return new Response("Unauthorized - Cron only", {
+      status: 401,
+      headers: corsHeaders,
+    });
+  }
+
   try {
     /*
     - select users , user_movies, movies, movie_providers
@@ -27,29 +36,57 @@ Deno.serve(async (req) => {
       .filter("created_at", "gt", lastWeek.toISOString().slice(0, 10));
 
     if (error) {
+      console.log("Error fetching recently available streams:", error);
       throw error;
     }
 
-    // group into emails
+    if (data.length === 0) {
+      console.log("No new available streams found");
+      return new Response(JSON.stringify({}), {
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    // group by user_id
     const grouped = data.reduce(
-      (acc: Record<string, typeof data>, curr: (typeof data)[number]) => {
-        if (!curr.email) {
+      (
+        acc: Record<string, { email: string | null; streams: typeof data }>,
+        curr: (typeof data)[number]
+      ) => {
+        if (!curr.user_id) {
           return acc;
         }
-        if (!acc[curr.email]) {
-          acc[curr.email] = [];
+        if (!acc[curr.user_id]) {
+          acc[curr.user_id] = { email: curr.email, streams: [] };
         }
-        acc[curr.email].push(curr);
+        acc[curr.user_id].streams.push(curr);
         return acc;
       },
       {}
     );
 
-    const promises = Object.entries(grouped).map(([email, streams]) => {
-      const data: SendData = {
-        to: email,
-        subject: "Your watchlist items are now available",
-        html: `
+    const promises = Object.entries(grouped).map(
+      async ([userId, { email, streams }]) => {
+        // Create in-app notification
+
+        await adminClient.from("notifications").insert(
+          streams.map((stream) => ({
+            user_id: userId,
+            type: "new_availability",
+            title: "New content available",
+            message: `"${stream.title}" is now available on ${stream.provider_name}`,
+          }))
+        );
+
+        // Send email notification if email exists
+        if (!email) {
+          return;
+        }
+
+        const emailData: SendData = {
+          to: email,
+          subject: "Your watchlist items are now available",
+          html: `
           Hi,
           These items from your watchlist are now available on one of your streaming services:
           <ul>
@@ -60,13 +97,14 @@ Deno.serve(async (req) => {
               .join("")}
           </ul>
           `,
-      };
+        };
 
-      return adminClient.functions.invoke("send-email-notification", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-    });
+        return adminClient.functions.invoke("send-email-notification", {
+          method: "POST",
+          body: JSON.stringify(emailData),
+        });
+      }
+    );
 
     const result = await Promise.allSettled(promises);
     const failed = result.filter((r) => r.status === "rejected");
@@ -91,7 +129,6 @@ Deno.serve(async (req) => {
 /*
 
 curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/get-recently-available' \
-    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
     --header 'Content-Type: application/json' \
     --data '{"name":"Functions"}'
 */

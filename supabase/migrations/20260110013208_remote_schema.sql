@@ -1,0 +1,1179 @@
+
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+
+CREATE EXTENSION IF NOT EXISTS "pg_cron" WITH SCHEMA "pg_catalog";
+
+
+
+
+
+
+CREATE EXTENSION IF NOT EXISTS "pg_net" WITH SCHEMA "extensions";
+
+
+
+
+
+
+CREATE EXTENSION IF NOT EXISTS "pgsodium";
+
+
+
+
+
+
+COMMENT ON SCHEMA "public" IS 'standard public schema';
+
+
+
+CREATE EXTENSION IF NOT EXISTS "pg_graphql" WITH SCHEMA "graphql";
+
+
+
+
+
+
+CREATE EXTENSION IF NOT EXISTS "pg_stat_statements" WITH SCHEMA "extensions";
+
+
+
+
+
+
+CREATE EXTENSION IF NOT EXISTS "pgcrypto" WITH SCHEMA "extensions";
+
+
+
+
+
+
+CREATE EXTENSION IF NOT EXISTS "pgjwt" WITH SCHEMA "extensions";
+
+
+
+
+
+
+CREATE EXTENSION IF NOT EXISTS "supabase_vault" WITH SCHEMA "vault";
+
+
+
+
+
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "extensions";
+
+
+
+
+
+SET default_tablespace = '';
+
+SET default_table_access_method = "heap";
+
+
+CREATE TABLE IF NOT EXISTS "public"."movie_providers" (
+    "id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "movie_id" bigint NOT NULL,
+    "provider_type" character varying NOT NULL,
+    "provider_name" character varying NOT NULL
+);
+
+
+ALTER TABLE "public"."movie_providers" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."movies" (
+    "id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "description" character varying,
+    "release_date" "date",
+    "production" character varying,
+    "title" character varying NOT NULL,
+    "movie_db_id" bigint NOT NULL,
+    "medium" "text" NOT NULL,
+    "providers_refreshed_date" "date" NOT NULL
+);
+
+
+ALTER TABLE "public"."movies" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."movies_users" (
+    "movie_id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "user_id" "uuid" NOT NULL,
+    "rating" smallint,
+    "watched" boolean NOT NULL,
+    "notes" "text"
+);
+
+
+ALTER TABLE "public"."movies_users" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."user_providers" (
+    "id" "uuid" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "provider_name" "text" NOT NULL
+);
+
+
+ALTER TABLE "public"."user_providers" OWNER TO "postgres";
+
+
+CREATE OR REPLACE VIEW "public"."available_streams" WITH ("security_invoker"='on') AS
+ SELECT "users"."email",
+    "movies"."title",
+    "movie_providers"."provider_name",
+    "movie_providers"."provider_type",
+    "movie_providers"."created_at"
+   FROM ((("auth"."users"
+     LEFT JOIN "public"."movies_users" ON (("users"."id" = "movies_users"."user_id")))
+     LEFT JOIN "public"."movies" ON (("movies"."id" = "movies_users"."movie_id")))
+     LEFT JOIN "public"."movie_providers" ON (("movie_providers"."movie_id" = "movies"."id")))
+  WHERE (("movie_providers"."provider_name")::"text" IN ( SELECT "user_providers"."provider_name"
+           FROM "public"."user_providers"
+          WHERE ("user_providers"."id" = "users"."id")));
+
+
+ALTER TABLE "public"."available_streams" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."book_availability" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "location_id" "uuid" NOT NULL,
+    "status" "text" NOT NULL,
+    "next_available_timestamp" "text",
+    "synced_timestamp" "text" NOT NULL,
+    "url" "text" NOT NULL
+);
+
+
+ALTER TABLE "public"."book_availability" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."book_metadata" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "title" "text" NOT NULL,
+    "author" "text" NOT NULL,
+    "isbn" "text",
+    "isbn13" "text",
+    "image" "text"
+);
+
+
+ALTER TABLE "public"."book_metadata" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."books" (
+    "id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "title" character varying,
+    "image" character varying,
+    "isbn" character varying,
+    "isbn13" character varying,
+    "status" character varying,
+    "goodreads_url" character varying,
+    "library_url" character varying,
+    "userid" bigint NOT NULL,
+    "borrow_box_status" "text",
+    "borrow_box_url" "text",
+    "borrow_box_preview_url" "text",
+    "borrow_box_next_available_epoch" bigint,
+    "description" "text",
+    "library_status" "json",
+    "google_search_status" boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE "public"."books" OWNER TO "postgres";
+
+
+ALTER TABLE "public"."books" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."books_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."location" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "name" "text" NOT NULL
+);
+
+
+ALTER TABLE "public"."location" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."movie_credits" (
+    "id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "movie_id" bigint NOT NULL,
+    "name" character varying NOT NULL,
+    "role" character varying NOT NULL
+);
+
+
+ALTER TABLE "public"."movie_credits" OWNER TO "postgres";
+
+
+ALTER TABLE "public"."movie_credits" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."movie_credits_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+
+ALTER TABLE "public"."movie_providers" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."movie_providers_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."movie_videos" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "url" "text" NOT NULL,
+    "movie_id" bigint NOT NULL,
+    "published_at" timestamp with time zone NOT NULL,
+    "video_type" "text"
+);
+
+
+ALTER TABLE "public"."movie_videos" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."movies_genres" (
+    "id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "movie_id" bigint NOT NULL,
+    "genre" character varying
+);
+
+
+ALTER TABLE "public"."movies_genres" OWNER TO "postgres";
+
+
+ALTER TABLE "public"."movies_genres" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."movies_genres_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+
+ALTER TABLE "public"."movies" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."movies_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."user" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "name" "text" NOT NULL
+);
+
+
+ALTER TABLE "public"."user" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."user_book" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "book_metadata_id" "uuid" NOT NULL,
+    "user_id" "uuid" NOT NULL,
+    "status" "text" NOT NULL,
+    "rating" smallint,
+    "synced_timestamp" "text" NOT NULL
+);
+
+
+ALTER TABLE "public"."user_book" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."user_book_source" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "url" "text" NOT NULL,
+    "name" "text" NOT NULL,
+    "user_id" "uuid" NOT NULL
+);
+
+
+ALTER TABLE "public"."user_book_source" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."user_memories" (
+    "id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "user_id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "memory" "text",
+    "answer" "text" NOT NULL
+);
+
+
+ALTER TABLE "public"."user_memories" OWNER TO "postgres";
+
+
+ALTER TABLE "public"."user_memories" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."user_memories_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."user_push_subscriptions" (
+    "user_id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "endpoint" "text" NOT NULL,
+    "keys" "jsonb"
+);
+
+
+ALTER TABLE "public"."user_push_subscriptions" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."users" (
+    "id" bigint NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"(),
+    "goodreads_id" character varying NOT NULL,
+    "shelf" character varying NOT NULL,
+    "username" character varying NOT NULL
+);
+
+
+ALTER TABLE "public"."users" OWNER TO "postgres";
+
+
+ALTER TABLE "public"."users" ALTER COLUMN "id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."users_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+
+ALTER TABLE ONLY "public"."book_availability"
+    ADD CONSTRAINT "book_availability_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."book_metadata"
+    ADD CONSTRAINT "book_metadata_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."books"
+    ADD CONSTRAINT "books_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."location"
+    ADD CONSTRAINT "location_name_key" UNIQUE ("name");
+
+
+
+ALTER TABLE ONLY "public"."location"
+    ADD CONSTRAINT "location_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."movie_credits"
+    ADD CONSTRAINT "movie_credits_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."movie_providers"
+    ADD CONSTRAINT "movie_providers_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."movie_videos"
+    ADD CONSTRAINT "movie_videos_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."movies_genres"
+    ADD CONSTRAINT "movies_genres_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."movies"
+    ADD CONSTRAINT "movies_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."movies_users"
+    ADD CONSTRAINT "movies_users_pkey" PRIMARY KEY ("movie_id", "user_id");
+
+
+
+ALTER TABLE ONLY "public"."user_book"
+    ADD CONSTRAINT "user_book_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."user_book_source"
+    ADD CONSTRAINT "user_book_source_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."user_memories"
+    ADD CONSTRAINT "user_memories_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."user"
+    ADD CONSTRAINT "user_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."user_providers"
+    ADD CONSTRAINT "user_providers_pkey" PRIMARY KEY ("id", "provider_name");
+
+
+
+ALTER TABLE ONLY "public"."user_push_subscriptions"
+    ADD CONSTRAINT "user_push_subscriptions_pkey" PRIMARY KEY ("user_id", "endpoint");
+
+
+
+ALTER TABLE ONLY "public"."users"
+    ADD CONSTRAINT "users_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."book_availability"
+    ADD CONSTRAINT "book_availability_location_id_fkey" FOREIGN KEY ("location_id") REFERENCES "public"."location"("id");
+
+
+
+ALTER TABLE ONLY "public"."books"
+    ADD CONSTRAINT "books_userid_fkey" FOREIGN KEY ("userid") REFERENCES "public"."users"("id");
+
+
+
+ALTER TABLE ONLY "public"."movie_credits"
+    ADD CONSTRAINT "movie_credits_movie_id_fkey" FOREIGN KEY ("movie_id") REFERENCES "public"."movies"("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."movie_providers"
+    ADD CONSTRAINT "movie_providers_movie_id_fkey" FOREIGN KEY ("movie_id") REFERENCES "public"."movies"("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."movies_genres"
+    ADD CONSTRAINT "movies_genres_movie_id_fkey" FOREIGN KEY ("movie_id") REFERENCES "public"."movies"("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."movies_users"
+    ADD CONSTRAINT "movies_users_movie_id_fkey" FOREIGN KEY ("movie_id") REFERENCES "public"."movies"("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."movies_users"
+    ADD CONSTRAINT "movies_users_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."movie_videos"
+    ADD CONSTRAINT "public_movie_videos_movie_id_fkey" FOREIGN KEY ("movie_id") REFERENCES "public"."movies"("id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."user_providers"
+    ADD CONSTRAINT "public_user_providers_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id");
+
+
+
+ALTER TABLE ONLY "public"."user_push_subscriptions"
+    ADD CONSTRAINT "public_user_push_subscriptions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id");
+
+
+
+ALTER TABLE ONLY "public"."user_book"
+    ADD CONSTRAINT "user_book_book_metadata_id_fkey" FOREIGN KEY ("book_metadata_id") REFERENCES "public"."book_metadata"("id");
+
+
+
+ALTER TABLE ONLY "public"."user_book_source"
+    ADD CONSTRAINT "user_book_source_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id");
+
+
+
+ALTER TABLE ONLY "public"."user_book"
+    ADD CONSTRAINT "user_book_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id");
+
+
+
+ALTER TABLE ONLY "public"."user_memories"
+    ADD CONSTRAINT "user_memories_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id");
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE POLICY "Auth select" ON "public"."movie_videos" FOR SELECT TO "authenticated" USING (true);
+
+
+
+CREATE POLICY "Enable delete for users based on user_id" ON "public"."movies_users" FOR DELETE TO "authenticated" USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Enable delete for users based on user_id" ON "public"."user_providers" FOR DELETE USING (("auth"."uid"() = "id"));
+
+
+
+CREATE POLICY "Enable insert for authenticated users only" ON "public"."movie_credits" FOR INSERT TO "authenticated" WITH CHECK (true);
+
+
+
+CREATE POLICY "Enable insert for authenticated users only" ON "public"."movie_providers" FOR INSERT TO "authenticated" WITH CHECK (true);
+
+
+
+CREATE POLICY "Enable insert for authenticated users only" ON "public"."movies" FOR INSERT TO "authenticated" WITH CHECK (true);
+
+
+
+CREATE POLICY "Enable insert for authenticated users only" ON "public"."movies_genres" FOR INSERT TO "authenticated" WITH CHECK (true);
+
+
+
+CREATE POLICY "Enable insert for authenticated users only" ON "public"."user_memories" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Enable insert for authenticated users only" ON "public"."user_providers" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "id"));
+
+
+
+CREATE POLICY "Enable insert for authenticated users only" ON "public"."user_push_subscriptions" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."books" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."movie_credits" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."movie_providers" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."movies" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."movies_genres" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."movies_users" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for all users" ON "public"."users" FOR SELECT USING (true);
+
+
+
+CREATE POLICY "Enable read access for authd users" ON "public"."user_memories" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Enable read access for authd users" ON "public"."user_push_subscriptions" FOR SELECT USING (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Enable read access for own data" ON "public"."user_providers" FOR SELECT TO "authenticated" USING (("auth"."uid"() = "id"));
+
+
+
+CREATE POLICY "Enable update for users based on email" ON "public"."movies_users" FOR UPDATE TO "authenticated" USING (("auth"."uid"() = "user_id")) WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "Insert for current user" ON "public"."movies_users" FOR INSERT TO "authenticated" WITH CHECK (("auth"."uid"() = "user_id"));
+
+
+
+CREATE POLICY "User Providers Update" ON "public"."user_providers" FOR UPDATE TO "authenticated" USING (("auth"."uid"() = "id"));
+
+
+
+ALTER TABLE "public"."book_availability" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."book_metadata" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."books" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."location" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."movie_credits" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."movie_providers" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."movie_videos" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."movies" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."movies_genres" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."movies_users" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "update for authed users" ON "public"."user_push_subscriptions" FOR UPDATE TO "authenticated" USING (("auth"."uid"() = "user_id"));
+
+
+
+ALTER TABLE "public"."user" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."user_book" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."user_book_source" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."user_memories" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."user_providers" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."user_push_subscriptions" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."users" ENABLE ROW LEVEL SECURITY;
+
+
+
+
+ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";
+
+
+
+
+
+
+
+
+GRANT USAGE ON SCHEMA "public" TO "postgres";
+GRANT USAGE ON SCHEMA "public" TO "anon";
+GRANT USAGE ON SCHEMA "public" TO "authenticated";
+GRANT USAGE ON SCHEMA "public" TO "service_role";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+GRANT ALL ON TABLE "public"."movie_providers" TO "anon";
+GRANT ALL ON TABLE "public"."movie_providers" TO "authenticated";
+GRANT ALL ON TABLE "public"."movie_providers" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."movies" TO "anon";
+GRANT ALL ON TABLE "public"."movies" TO "authenticated";
+GRANT ALL ON TABLE "public"."movies" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."movies_users" TO "anon";
+GRANT ALL ON TABLE "public"."movies_users" TO "authenticated";
+GRANT ALL ON TABLE "public"."movies_users" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."user_providers" TO "anon";
+GRANT ALL ON TABLE "public"."user_providers" TO "authenticated";
+GRANT ALL ON TABLE "public"."user_providers" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."available_streams" TO "anon";
+GRANT ALL ON TABLE "public"."available_streams" TO "authenticated";
+GRANT ALL ON TABLE "public"."available_streams" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."book_availability" TO "anon";
+GRANT ALL ON TABLE "public"."book_availability" TO "authenticated";
+GRANT ALL ON TABLE "public"."book_availability" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."book_metadata" TO "anon";
+GRANT ALL ON TABLE "public"."book_metadata" TO "authenticated";
+GRANT ALL ON TABLE "public"."book_metadata" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."books" TO "anon";
+GRANT ALL ON TABLE "public"."books" TO "authenticated";
+GRANT ALL ON TABLE "public"."books" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."books_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."books_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."books_id_seq" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."location" TO "anon";
+GRANT ALL ON TABLE "public"."location" TO "authenticated";
+GRANT ALL ON TABLE "public"."location" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."movie_credits" TO "anon";
+GRANT ALL ON TABLE "public"."movie_credits" TO "authenticated";
+GRANT ALL ON TABLE "public"."movie_credits" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."movie_credits_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."movie_credits_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."movie_credits_id_seq" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."movie_providers_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."movie_providers_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."movie_providers_id_seq" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."movie_videos" TO "anon";
+GRANT ALL ON TABLE "public"."movie_videos" TO "authenticated";
+GRANT ALL ON TABLE "public"."movie_videos" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."movies_genres" TO "anon";
+GRANT ALL ON TABLE "public"."movies_genres" TO "authenticated";
+GRANT ALL ON TABLE "public"."movies_genres" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."movies_genres_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."movies_genres_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."movies_genres_id_seq" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."movies_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."movies_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."movies_id_seq" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."user" TO "anon";
+GRANT ALL ON TABLE "public"."user" TO "authenticated";
+GRANT ALL ON TABLE "public"."user" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."user_book" TO "anon";
+GRANT ALL ON TABLE "public"."user_book" TO "authenticated";
+GRANT ALL ON TABLE "public"."user_book" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."user_book_source" TO "anon";
+GRANT ALL ON TABLE "public"."user_book_source" TO "authenticated";
+GRANT ALL ON TABLE "public"."user_book_source" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."user_memories" TO "anon";
+GRANT ALL ON TABLE "public"."user_memories" TO "authenticated";
+GRANT ALL ON TABLE "public"."user_memories" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."user_memories_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."user_memories_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."user_memories_id_seq" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."user_push_subscriptions" TO "anon";
+GRANT ALL ON TABLE "public"."user_push_subscriptions" TO "authenticated";
+GRANT ALL ON TABLE "public"."user_push_subscriptions" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."users" TO "anon";
+GRANT ALL ON TABLE "public"."users" TO "authenticated";
+GRANT ALL ON TABLE "public"."users" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."users_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."users_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."users_id_seq" TO "service_role";
+
+
+
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "postgres";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "anon";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "authenticated";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES  TO "service_role";
+
+
+
+
+
+
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "postgres";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "anon";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "authenticated";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS  TO "service_role";
+
+
+
+
+
+
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "postgres";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "anon";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "authenticated";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES  TO "service_role";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
