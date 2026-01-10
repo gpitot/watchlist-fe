@@ -159,7 +159,7 @@ export const Homepage: React.FC = () => {
                 <NotificationCenter />
                 <button
                   onClick={copyShareLink}
-                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-surface hover:bg-surface-hover border border-border-default hover:border-border-hover text-text-secondary hover:text-text-primary transition-all text-sm font-medium active:scale-95"
+                  className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4 rounded-full bg-surface hover:bg-surface-hover border border-border-default hover:border-border-hover text-text-secondary hover:text-text-primary transition-all text-sm font-medium active:scale-95"
                 >
                   <svg
                     className="w-3.5 h-3.5 sm:w-4 sm:h-4"
@@ -178,7 +178,7 @@ export const Homepage: React.FC = () => {
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-surface hover:bg-surface-hover border border-border-default hover:border-border-hover text-text-secondary hover:text-text-primary transition-all text-sm font-medium active:scale-95"
+                  className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3 sm:px-4 rounded-full bg-surface hover:bg-surface-hover border border-border-default hover:border-border-hover text-text-secondary hover:text-text-primary transition-all text-sm font-medium active:scale-95"
                 >
                   <svg
                     className="w-3.5 h-3.5 sm:w-4 sm:h-4"
