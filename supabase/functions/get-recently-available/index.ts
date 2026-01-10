@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
         // Create in-app notification
 
         await adminClient.from("notifications").insert(
-          stream.map((stream) => ({
+          streams.map((stream) => ({
             user_id: userId,
             type: "new_availability",
             title: "New content available",
