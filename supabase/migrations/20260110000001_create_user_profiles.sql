@@ -44,22 +44,6 @@ grant trigger on table "public"."user_profiles" to "service_role";
 grant truncate on table "public"."user_profiles" to "service_role";
 grant update on table "public"."user_profiles" to "service_role";
 
--- Create policies
-create policy "Users can view all profiles"
-    on "public"."user_profiles"
-    as permissive
-    for select
-    to authenticated
-    using (true);
-
-create policy "Users can update own profile"
-    on "public"."user_profiles"
-    as permissive
-    for update
-    to authenticated
-    using (auth.uid() = id)
-    with check (auth.uid() = id);
-
 -- Create function to handle user profile creation/update
 create or replace function public.handle_auth_user_change()
 returns trigger as $$
