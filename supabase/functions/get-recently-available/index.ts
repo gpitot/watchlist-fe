@@ -30,26 +30,46 @@ Deno.serve(async (req) => {
       throw error;
     }
 
-    // group into emails
+    // group by user_id
     const grouped = data.reduce(
-      (acc: Record<string, typeof data>, curr: (typeof data)[number]) => {
-        if (!curr.email) {
+      (
+        acc: Record<string, { email: string | null; streams: typeof data }>,
+        curr: (typeof data)[number]
+      ) => {
+        if (!curr.user_id) {
           return acc;
         }
-        if (!acc[curr.email]) {
-          acc[curr.email] = [];
+        if (!acc[curr.user_id]) {
+          acc[curr.user_id] = { email: curr.email, streams: [] };
         }
-        acc[curr.email].push(curr);
+        acc[curr.user_id].streams.push(curr);
         return acc;
       },
       {}
     );
 
-    const promises = Object.entries(grouped).map(([email, streams]) => {
-      const data: SendData = {
-        to: email,
-        subject: "Your watchlist items are now available",
-        html: `
+    const promises = Object.entries(grouped).map(
+      async ([userId, { email, streams }]) => {
+        // Create in-app notification
+
+        await adminClient.from("notifications").insert(
+          stream.map((stream) => ({
+            user_id: userId,
+            type: "new_availability",
+            title: "New content available",
+            message: `"${stream.title}" is now available on ${stream.provider_name}`,
+          }))
+        );
+
+        // Send email notification if email exists
+        if (!email) {
+          return;
+        }
+
+        const emailData: SendData = {
+          to: email,
+          subject: "Your watchlist items are now available",
+          html: `
           Hi,
           These items from your watchlist are now available on one of your streaming services:
           <ul>
@@ -60,13 +80,14 @@ Deno.serve(async (req) => {
               .join("")}
           </ul>
           `,
-      };
+        };
 
-      return adminClient.functions.invoke("send-email-notification", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-    });
+        return adminClient.functions.invoke("send-email-notification", {
+          method: "POST",
+          body: JSON.stringify(emailData),
+        });
+      }
+    );
 
     const result = await Promise.allSettled(promises);
     const failed = result.filter((r) => r.status === "rejected");

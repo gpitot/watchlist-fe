@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "local:supabase": "supabase start --exclude realtime storage-api imgproxy kong inbucket",
     "local:functions": "supabase functions serve",
-    "db:types": "supabase gen types typescript --project-id ambmualoussdnneksprb > src/interfaces/database.types.ts && supabase gen types typescript --project-id ambmualoussdnneksprb > supabase/functions/_shared/database.types.ts"
+    "db:types": "supabase gen types typescript --project-id ambmualoussdnneksprb > src/interfaces/database.types.ts && supabase gen types typescript --project-id ambmualoussdnneksprb > supabase/functions/_shared/database.types.ts",
+    "deploy:functions": "supabase functions deploy",
+    "deploy:db": "supabase db push"
   },
   "dependencies": {
     "@sendgrid/mail": "^8.1.3",
