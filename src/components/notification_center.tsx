@@ -40,10 +40,10 @@ const NotificationItem: React.FC<{
     <button
       onClick={handleClick}
       className={classNames(
-        "w-full text-left px-3 py-3 transition-all border-b border-border-default last:border-b-0",
+        "w-full text-left px-4 py-3 sm:px-3 sm:py-3 transition-all border-b border-border-default last:border-b-0 active:scale-[0.99]",
         notification.read
-          ? "bg-transparent hover:bg-surface-hover"
-          : "bg-primary/5 hover:bg-primary/10"
+          ? "bg-transparent hover:bg-surface-hover active:bg-surface-hover"
+          : "bg-primary/5 hover:bg-primary/10 active:bg-primary/10"
       )}
     >
       <div className="flex items-start gap-3">
@@ -56,16 +56,16 @@ const NotificationItem: React.FC<{
         <div className="flex-1 min-w-0">
           <p
             className={classNames(
-              "text-sm font-medium truncate",
+              "text-sm sm:text-sm font-medium line-clamp-2 sm:truncate",
               notification.read ? "text-text-secondary" : "text-text-primary"
             )}
           >
             {notification.title}
           </p>
-          <p className="text-xs text-text-tertiary mt-0.5 line-clamp-2">
+          <p className="text-xs text-text-tertiary mt-1 line-clamp-2">
             {notification.message}
           </p>
-          <p className="text-xs text-text-muted mt-1">
+          <p className="text-xs text-text-muted mt-1.5">
             {formatTimeAgo(notification.created_at)}
           </p>
         </div>
@@ -131,23 +131,44 @@ export const NotificationCenter: React.FC = () => {
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 z-10"
+            className="fixed inset-0 z-10 bg-black/20 sm:bg-transparent"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-bg-tertiary border border-border-default shadow-primary-lg z-20 overflow-hidden">
+          <div className="fixed sm:absolute left-4 right-4 sm:left-auto sm:right-0 top-16 sm:top-auto sm:mt-2 max-w-md sm:w-96 rounded-2xl bg-bg-tertiary border border-border-default shadow-primary-lg z-20 overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border-default">
               <h3 className="font-semibold text-text-primary">Notifications</h3>
-              {unreadCount > 0 && (
+              <div className="flex items-center gap-2">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={handleMarkAllAsRead}
+                    className="text-xs text-primary hover:text-primary-light transition-colors"
+                  >
+                    Mark all as read
+                  </button>
+                )}
                 <button
-                  onClick={handleMarkAllAsRead}
-                  className="text-xs text-primary hover:text-primary-light transition-colors"
+                  onClick={() => setIsOpen(false)}
+                  className="sm:hidden flex items-center justify-center w-8 h-8 rounded-full hover:bg-surface-hover transition-colors"
+                  aria-label="Close notifications"
                 >
-                  Mark all as read
+                  <svg
+                    className="w-5 h-5 text-text-secondary"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
                 </button>
-              )}
+              </div>
             </div>
 
-            <div className="max-h-96 overflow-y-auto">
+            <div className="max-h-[60vh] sm:max-h-96 overflow-y-auto">
               {notifications.length === 0 ? (
                 <div className="px-4 py-8 text-center">
                   <svg

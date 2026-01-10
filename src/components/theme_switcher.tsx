@@ -19,7 +19,7 @@ export const ThemeSwitcher: React.FC = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-surface hover:bg-surface-hover border border-border-default hover:border-border-hover text-text-primary transition-all text-sm font-medium active:scale-95"
+        className="flex items-center gap-2 h-9 sm:h-10 px-3 sm:px-4 rounded-full bg-surface hover:bg-surface-hover border border-border-default hover:border-border-hover text-text-primary transition-all text-sm font-medium active:scale-95"
         aria-label="Switch theme"
       >
         <span className="text-base">{currentTheme.icon}</span>
