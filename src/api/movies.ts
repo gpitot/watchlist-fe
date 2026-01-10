@@ -360,3 +360,26 @@ export const useUpdateUserProviders = () => {
     },
   });
 };
+
+export const useGetAllAvailableProviders = () => {
+  return useQuery({
+    queryKey: ["allProviders"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("movie_providers")
+        .select("provider_name")
+        .not("provider_name", "is", null);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      // Get unique provider names and sort them
+      const uniqueProviders = Array.from(
+        new Set(data.map((p: { provider_name: string }) => p.provider_name))
+      ).sort();
+
+      return uniqueProviders;
+    },
+  });
+};

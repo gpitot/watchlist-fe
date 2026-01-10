@@ -10,8 +10,8 @@ import {
   useGetMovies,
   useGetUserProviders,
   useUpdateUserProviders,
+  useGetAllAvailableProviders,
 } from "api/movies";
-import { useMemo } from "react";
 import { Option } from "components/multi_select";
 import { useShareWatchlist } from "hooks/useShareWatchlist";
 import { supabase } from "api/database";
@@ -61,6 +61,7 @@ export const Homepage: React.FC = () => {
 
   const { data: userProviders } = useGetUserProviders(user?.id);
   const { mutate } = useUpdateUserProviders();
+  const { data: allProviders } = useGetAllAvailableProviders();
 
   const userProviderOptions = (userProviders ?? []).map(
     ({ provider_name: p }) => ({
@@ -86,18 +87,10 @@ export const Homepage: React.FC = () => {
     mutate({ providersAdded, providersToDelete });
   };
 
-  const allProviderOptions = useMemo(() => {
-    const providerSet = new Set<string>();
-    data?.movies.map((m) => {
-      const providers: string[] = m.movie_providers
-        .filter((p) => p.provider_type === "free" && Boolean(p.provider_name))
-        .map((p) => p.provider_name);
-      providers.forEach((p) => providerSet.add(p));
-    });
-    return Array.from(providerSet)
-      .sort()
-      .map((p) => ({ label: p, value: p }));
-  }, [data?.movies]);
+  const allProviderOptions = (allProviders ?? []).map((p) => ({
+    label: p,
+    value: p,
+  }));
 
   if (isLoading) {
     return (
