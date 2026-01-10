@@ -12,13 +12,15 @@ const adminClient = createClient<Database>(
 const HOUR = 60 * 60 * 1000;
 
 Deno.serve(async (req) => {
-  console.log("[g] hit");
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   if (!checkCronAuth(req)) {
-    return new Response("Unauthorized2", { status: 401, headers: corsHeaders });
+    return new Response("Unauthorized - Cron only", {
+      status: 401,
+      headers: corsHeaders,
+    });
   }
 
   try {

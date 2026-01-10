@@ -24,7 +24,10 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
   if (!checkCronAuth(req)) {
-    return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+    return new Response("Unauthorized - Cron only", {
+      status: 401,
+      headers: corsHeaders,
+    });
   }
   try {
     const { data, error } = await adminClient.from("movies").select(
