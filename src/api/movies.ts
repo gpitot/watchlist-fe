@@ -368,7 +368,6 @@ export const useGetAllAvailableProviders = () => {
       const { data, error } = await supabase
         .from("movie_providers")
         .select("provider_name")
-        .eq("provider_type", "free")
         .not("provider_name", "is", null);
 
       if (error) {
