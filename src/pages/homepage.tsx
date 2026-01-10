@@ -1,4 +1,5 @@
 import { MultiSelect } from "components/multi_select";
+import { NotificationCenter } from "components/notification_center";
 import { TrendingSection } from "components/trending_section";
 import { AddMovie } from "pages/add-movie";
 import { Movies } from "pages/movies";
@@ -155,6 +156,7 @@ export const Homepage: React.FC = () => {
             {isLoggedIn && !isSharing && (
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <ThemeSwitcher />
+                <NotificationCenter />
                 <button
                   onClick={copyShareLink}
                   className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-surface hover:bg-surface-hover border border-border-default hover:border-border-hover text-text-secondary hover:text-text-primary transition-all text-sm font-medium active:scale-95"
