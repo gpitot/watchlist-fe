@@ -1,4 +1,5 @@
 import { MultiSelect } from "components/multi_select";
+import { TrendingSection } from "components/trending_section";
 import { AddMovie } from "pages/add-movie";
 import { Movies } from "pages/movies";
 import { ThemeSwitcher } from "components/theme_switcher";
@@ -290,6 +291,8 @@ export const Homepage: React.FC = () => {
             </p>
           </div>
         )}
+
+        {isLoggedIn && !isSharing && <TrendingSection />}
 
         <Movies
           movies={data.movies}
