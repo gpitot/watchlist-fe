@@ -2,6 +2,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { Database } from "../_shared/database.types.ts";
 import { createClient } from "supabase";
 import type { SendData } from "../_shared/email.ts";
+import { checkCronAuth } from "../_shared/cron-auth.ts";
 
 const adminClient = createClient<Database>(
   Deno.env.get("SUPABASE_URL") ?? "",
@@ -11,9 +12,15 @@ const adminClient = createClient<Database>(
 const HOUR = 60 * 60 * 1000;
 
 Deno.serve(async (req) => {
+  console.log("[g] hit");
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
+
+  if (!checkCronAuth(req)) {
+    return new Response("Unauthorized2", { status: 401, headers: corsHeaders });
+  }
+
   try {
     /*
     - select users , user_movies, movies, movie_providers
@@ -27,7 +34,15 @@ Deno.serve(async (req) => {
       .filter("created_at", "gt", lastWeek.toISOString().slice(0, 10));
 
     if (error) {
+      console.log("Error fetching recently available streams:", error);
       throw error;
+    }
+
+    if (data.length === 0) {
+      console.log("No new available streams found");
+      return new Response(JSON.stringify({}), {
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
     }
 
     // group by user_id
@@ -112,7 +127,6 @@ Deno.serve(async (req) => {
 /*
 
 curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/get-recently-available' \
-    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
     --header 'Content-Type: application/json' \
     --data '{"name":"Functions"}'
 */

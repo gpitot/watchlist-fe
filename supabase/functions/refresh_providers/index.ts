@@ -1,4 +1,5 @@
 import { corsHeaders } from "../_shared/cors.ts";
+import { checkCronAuth } from "../_shared/cron-auth.ts";
 import { Database } from "../_shared/database.types.ts";
 import { MovieAndShowService, isMedium } from "../_shared/movie_service.ts";
 import { createClient } from "supabase";
@@ -21,6 +22,9 @@ const isValidRefreshDate = (date: string) => {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
+  }
+  if (!checkCronAuth(req)) {
+    return new Response("Unauthorized", { status: 401, headers: corsHeaders });
   }
   try {
     const { data, error } = await adminClient.from("movies").select(
