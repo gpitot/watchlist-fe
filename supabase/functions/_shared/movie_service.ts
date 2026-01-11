@@ -5,6 +5,7 @@ type MovieDetails = {
   title: string;
   overview: string;
   release_date?: string;
+  poster_path?: string | null;
   production_companies?: { name: string }[];
   genres: { name: string }[];
   credits: {
@@ -36,6 +37,7 @@ export type MovieDetailsResponse = {
   description: string;
   release: Date | undefined;
   production?: string;
+  poster_path?: string;
   genres: string[];
   credits: {
     cast: string[];
@@ -124,6 +126,7 @@ export class MovieAndShowService {
       description: res.overview,
       release: res.release_date ? new Date(res.release_date) : undefined,
       production: (res.production_companies?.[0] ?? {}).name,
+      poster_path: this.getFullPosterPath(res.poster_path),
       genres: res.genres.map((g) => g.name),
       credits: this.parseCreditsResult(res.credits),
       providers: this.parseStreamingProvidersResult(res["watch/providers"]),
