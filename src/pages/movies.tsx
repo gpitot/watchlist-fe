@@ -26,7 +26,7 @@ const getMovieState = (
   return "unavailable";
 };
 
-const StateIndicator: React.FC<{ state: MovieState }> = ({ state }) => {
+export const StateIndicator: React.FC<{ state: MovieState }> = ({ state }) => {
   if (state === "watched") {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-primary-lighter border border-primary/30">

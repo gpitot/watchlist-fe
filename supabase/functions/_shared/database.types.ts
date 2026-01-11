@@ -274,6 +274,7 @@ export type Database = {
           id: number
           medium: string
           movie_db_id: number
+          poster_path: string | null
           production: string | null
           providers_refreshed_date: string
           release_date: string | null
@@ -285,6 +286,7 @@ export type Database = {
           id?: number
           medium: string
           movie_db_id: number
+          poster_path?: string | null
           production?: string | null
           providers_refreshed_date: string
           release_date?: string | null
@@ -296,6 +298,7 @@ export type Database = {
           id?: number
           medium?: string
           movie_db_id?: number
+          poster_path?: string | null
           production?: string | null
           providers_refreshed_date?: string
           release_date?: string | null
@@ -365,13 +368,6 @@ export type Database = {
             referencedRelation: "movies"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "movies_users_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "available_streams"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       notifications: {
@@ -405,13 +401,40 @@ export type Database = {
           type?: string
           user_id?: string
         }
+        Relationships: []
+      }
+      trending: {
+        Row: {
+          created_at: string
+          fetched_at: string
+          id: number
+          medium: string
+          movie_id: number
+          trending_rank: number
+        }
+        Insert: {
+          created_at?: string
+          fetched_at?: string
+          id?: number
+          medium: string
+          movie_id: number
+          trending_rank: number
+        }
+        Update: {
+          created_at?: string
+          fetched_at?: string
+          id?: number
+          medium?: string
+          movie_id?: number
+          trending_rank?: number
+        }
         Relationships: [
           {
-            foreignKeyName: "notifications_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "available_streams"
-            referencedColumns: ["user_id"]
+            foreignKeyName: "trending_movie_id_fkey"
+            columns: ["movie_id"]
+            isOneToOne: true
+            referencedRelation: "movies"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -532,15 +555,31 @@ export type Database = {
           memory?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_memories_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "available_streams"
-            referencedColumns: ["user_id"]
-          },
-        ]
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_providers: {
         Row: {
@@ -558,15 +597,7 @@ export type Database = {
           id?: string
           provider_name?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "public_user_providers_id_fkey"
-            columns: ["id"]
-            isOneToOne: false
-            referencedRelation: "available_streams"
-            referencedColumns: ["user_id"]
-          },
-        ]
+        Relationships: []
       }
       user_push_subscriptions: {
         Row: {
@@ -587,15 +618,7 @@ export type Database = {
           keys?: Json | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "public_user_push_subscriptions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "available_streams"
-            referencedColumns: ["user_id"]
-          },
-        ]
+        Relationships: []
       }
       users: {
         Row: {

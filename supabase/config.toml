@@ -165,3 +165,6 @@ verify_jwt = false
 
 [functions.refresh_providers]
 verify_jwt = false
+
+[functions.refresh_trending]
+verify_jwt = false
