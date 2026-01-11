@@ -110,16 +110,16 @@ export const useSearchStreams = () => {
   });
 };
 
-export const useGetTrending = (timeWindow: "day" | "week" = "week") => {
+export const useGetTrending = (timeWindow: "day" | "week" = "week", userId?: string) => {
   return useQuery({
-    queryKey: ["trending", timeWindow],
+    queryKey: ["trending", timeWindow, userId],
     queryFn: async () => {
       const { data, error } = await supabase.functions.invoke<{
         movies: Stream[];
         tvs: Stream[];
       }>("trending", {
         method: "POST",
-        body: JSON.stringify({ timeWindow }),
+        body: JSON.stringify({ timeWindow, userId }),
       });
       if (error) {
         throw error;

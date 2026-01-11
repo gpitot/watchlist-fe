@@ -1,6 +1,7 @@
 import { Stream, useAddMovie, useGetTrending } from "api/movies";
 import classNames from "classnames";
 import { useState } from "react";
+import { useUserContext } from "providers/user_provider";
 
 const TrendingCard: React.FC<{
   item: Stream;
@@ -65,7 +66,8 @@ const TrendingCard: React.FC<{
 
 export const TrendingSection: React.FC = () => {
   const [timeWindow, setTimeWindow] = useState<"day" | "week">("week");
-  const { data, isLoading } = useGetTrending(timeWindow);
+  const { user } = useUserContext();
+  const { data, isLoading } = useGetTrending(timeWindow, user?.id);
   const { mutate: addMovie } = useAddMovie();
 
   const handleAdd = (body: { id: number; medium: string; streamData: Stream }) => {
