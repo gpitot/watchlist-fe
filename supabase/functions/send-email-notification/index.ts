@@ -1,23 +1,36 @@
 import { corsHeaders } from "../_shared/cors.ts";
-import Sendgrid from "@sendgrid/mail";
+import { checkCronAuth } from "../_shared/cron-auth.ts";
 import { SendData } from "../_shared/email.ts";
 
-const SENDGRID_API_KEY = Deno.env.get("SENDGRID_API_KEY");
-if (!SENDGRID_API_KEY) {
-  throw new Error("Missing SENDGRID_API_KEY");
+import { Resend } from "resend";
+
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+if (!RESEND_API_KEY) {
+  throw new Error("Missing RESEND_API_KEY");
 }
-Sendgrid.setApiKey(SENDGRID_API_KEY);
+const resend = new Resend(RESEND_API_KEY);
 
 export const DEFAULT_FROM = "guillaume.pitot@gmail.com";
 
 export const sendMail = async (data: SendData) => {
-  const res = await Sendgrid.send({ ...data, from: DEFAULT_FROM });
+  const res = await resend.emails.send({
+    from: DEFAULT_FROM,
+    to: data.to,
+    subject: data.subject,
+    html: data.html,
+  });
   console.log(res);
 };
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
+  }
+  if (!checkCronAuth(req)) {
+    return new Response("Unauthorized - Cron only", {
+      status: 401,
+      headers: corsHeaders,
+    });
   }
   try {
     const body = await req.json();
@@ -37,8 +50,9 @@ Deno.serve(async (req) => {
 
 /*
 
-curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/get-recently-available' \
-    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
+curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/send-email-notification' \
+    --header 'x-cron-secret: 1234812349asdfjhqwer' \
     --header 'Content-Type: application/json' \
-    --data '{"name":"Functions"}'
-*/
+    --data '{"to": "guillaume.pitot@gmail.com", "subject": "Test email", "html": "<h1>Hello from Resend!</h1>"}'
+
+    */
