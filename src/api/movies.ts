@@ -7,6 +7,7 @@ export type MovieDetailsResponse = {
   created_at: string;
   description: string | null;
   release_date?: string | null;
+  poster_path?: string | null;
   production?: string | null;
   watched: boolean;
   rating: number | null;
@@ -149,7 +150,8 @@ export const useAddMovie = () => {
             created_at: new Date().toISOString(),
             description: null,
             release_date: newMovie.streamData.release_date || null,
-            production: newMovie.streamData.poster_path || null,
+            poster_path: newMovie.streamData.poster_path || null,
+            production: null,
             watched: false,
             rating: null,
             medium: newMovie.streamData.medium,

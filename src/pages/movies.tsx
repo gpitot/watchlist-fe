@@ -82,35 +82,65 @@ const MovieCard: React.FC<{
         }
       )}
     >
-      <div className="flex flex-col gap-2.5">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-baseline gap-1.5 flex-wrap mb-1">
-              <h3
-                className={classNames(
-                  "font-medium text-base sm:text-lg",
-                  state === "watched" ? "text-text-secondary" : "text-text-primary"
-                )}
+      <div className="flex gap-3 sm:gap-4">
+        {/* Poster */}
+        <div className="flex-shrink-0 w-16 sm:w-20 h-24 sm:h-30 rounded-lg overflow-hidden bg-surface-hover border border-border-default">
+          {movie.poster_path ? (
+            <img
+              src={movie.poster_path}
+              alt={movie.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-text-tertiary">
+              <svg
+                className="w-8 h-8"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                {movie.title}
-              </h3>
-              {year && (
-                <span className="text-text-tertiary text-sm flex-shrink-0">({year})</span>
-              )}
-            </div>
-            <StateIndicator state={state} />
-          </div>
-
-          {movie.rating && (
-            <div className="flex-shrink-0 mt-0.5">
-              <Stars rating={movie.rating} size="sm" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
+                />
+              </svg>
             </div>
           )}
         </div>
 
-        {genres && (
-          <p className="text-text-tertiary text-sm line-clamp-1">{genres}</p>
-        )}
+        {/* Content */}
+        <div className="flex-1 min-w-0 flex flex-col gap-2.5">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline gap-1.5 flex-wrap mb-1">
+                <h3
+                  className={classNames(
+                    "font-medium text-base sm:text-lg",
+                    state === "watched" ? "text-text-secondary" : "text-text-primary"
+                  )}
+                >
+                  {movie.title}
+                </h3>
+                {year && (
+                  <span className="text-text-tertiary text-sm flex-shrink-0">({year})</span>
+                )}
+              </div>
+              <StateIndicator state={state} />
+            </div>
+
+            {movie.rating && (
+              <div className="flex-shrink-0 mt-0.5">
+                <Stars rating={movie.rating} size="sm" />
+              </div>
+            )}
+          </div>
+
+          {genres && (
+            <p className="text-text-tertiary text-sm line-clamp-1">{genres}</p>
+          )}
+        </div>
       </div>
     </button>
   );
