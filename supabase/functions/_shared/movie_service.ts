@@ -7,18 +7,18 @@ type MovieDetails = {
   release_date?: string;
   poster_path?: string | null;
   production_companies?: { name: string }[];
-  genres: { name: string }[];
-  credits: {
-    cast: { name: string }[];
-    crew: { name: string }[];
+  genres?: { name: string }[];
+  credits?: {
+    cast?: { name: string }[];
+    crew?: { name: string }[];
   };
-  "watch/providers": {
+  "watch/providers"?: {
     results?: {
       AU?: {
-        ads: { provider_name: string }[];
-        flatrate: { provider_name: string }[];
-        rent: { provider_name: string }[];
-        buy: { provider_name: string }[];
+        ads?: { provider_name: string }[];
+        flatrate?: { provider_name: string }[];
+        rent?: { provider_name: string }[];
+        buy?: { provider_name: string }[];
       };
     };
   };
@@ -72,15 +72,15 @@ export class MovieAndShowService {
 
   private parseCreditsResult(credits: MovieDetails["credits"]) {
     return {
-      cast: credits.cast.slice(0, 5).map((item) => item.name),
-      crew: credits.crew.slice(0, 5).map((item) => item.name),
+      cast: (credits?.cast ?? []).slice(0, 5).map((item) => item.name),
+      crew: (credits?.crew ?? []).slice(0, 5).map((item) => item.name),
     };
   }
 
   public parseStreamingProvidersResult(
-    res: MovieDetails["watch/providers"]
+    res: MovieDetails["watch/providers"] | undefined
   ): MovieDetailsResponse["providers"] {
-    if (!res.results || !res.results.AU) {
+    if (!res || !res.results || !res.results.AU) {
       return [];
     }
     const auResults = res.results.AU;
@@ -127,7 +127,7 @@ export class MovieAndShowService {
       release: res.release_date ? new Date(res.release_date) : undefined,
       production: (res.production_companies?.[0] ?? {}).name,
       poster_path: this.getFullPosterPath(res.poster_path),
-      genres: res.genres.map((g) => g.name),
+      genres: (res.genres ?? []).map((g) => g.name),
       credits: this.parseCreditsResult(res.credits),
       providers: this.parseStreamingProvidersResult(res["watch/providers"]),
     };

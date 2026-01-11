@@ -168,3 +168,6 @@ verify_jwt = false
 
 [functions.refresh_trending]
 verify_jwt = false
+
+[functions.backfill_poster_path]
+verify_jwt = false
