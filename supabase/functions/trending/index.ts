@@ -59,25 +59,34 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}));
     const timeWindow = isTimeWindow(body.timeWindow) ? body.timeWindow : "week";
-    const userId = body.userId as string | undefined;
 
-    // Fetch user's streaming providers if userId is provided
+    // Get user from auth token
+    const authHeader = req.headers.get("Authorization");
     let userProviders: string[] = [];
-    if (userId) {
+
+    if (authHeader) {
       const supabase = createClient<Database>(
         Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+        Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+        { global: { headers: { Authorization: authHeader } } }
       );
 
-      const { data, error } = await supabase
-        .from("user_providers")
-        .select("provider_name")
-        .eq("id", userId);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      if (error) {
-        console.error("Error fetching user providers:", error);
-      } else {
-        userProviders = data?.map((p) => p.provider_name) ?? [];
+      // Fetch user's streaming providers if user is authenticated
+      if (user) {
+        const { data, error } = await supabase
+          .from("user_providers")
+          .select("provider_name")
+          .eq("id", user.id);
+
+        if (error) {
+          console.error("Error fetching user providers:", error);
+        } else {
+          userProviders = data?.map((p) => p.provider_name) ?? [];
+        }
       }
     }
 
