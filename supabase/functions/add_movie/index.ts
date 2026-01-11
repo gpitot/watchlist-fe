@@ -60,6 +60,7 @@ Deno.serve(async (req) => {
           description: movieDetails.description,
           release_date: movieDetails.release?.toISOString(),
           production: movieDetails.production,
+          poster_path: movieDetails.poster_path,
           medium: medium,
           providers_refreshed_date: new Date().toISOString().slice(0, 10),
         })
