@@ -4,6 +4,7 @@ import { TrendingSection } from "components/trending_section";
 import { AddMovie } from "pages/add-movie";
 import { Movies } from "pages/movies";
 import { ThemeSwitcher } from "components/theme_switcher";
+import { ProviderOnboarding } from "components/provider_onboarding";
 import { useUserContext } from "providers/user_provider";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import {
@@ -15,6 +16,7 @@ import {
 import { Option } from "components/multi_select";
 import { useShareWatchlist } from "hooks/useShareWatchlist";
 import { supabase } from "api/database";
+import { useState, useEffect } from "react";
 
 export const Homepage: React.FC = () => {
   const { user, isLoggedIn, isAnonymous } = useUserContext();
@@ -91,6 +93,44 @@ export const Homepage: React.FC = () => {
     label: p,
     value: p,
   }));
+
+  // Onboarding state
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [hasCheckedOnboarding, setHasCheckedOnboarding] = useState(false);
+
+  // Check if user should see onboarding
+  useEffect(() => {
+    if (
+      isLoggedIn &&
+      !isSharing &&
+      !hasCheckedOnboarding &&
+      userProviders !== undefined
+    ) {
+      const hasCompletedOnboarding = localStorage.getItem(
+        `onboarding_completed_${user?.id}`
+      );
+
+      // Show onboarding if user has no providers and hasn't dismissed it
+      if (userProviders.length === 0 && !hasCompletedOnboarding) {
+        setIsOnboardingOpen(true);
+      }
+      setHasCheckedOnboarding(true);
+    }
+  }, [isLoggedIn, isSharing, userProviders, hasCheckedOnboarding, user?.id]);
+
+  const handleSaveOnboardingProviders = (selected: Option[]) => {
+    handleSelectProviders(selected);
+    if (user?.id) {
+      localStorage.setItem(`onboarding_completed_${user.id}`, "true");
+    }
+  };
+
+  const handleCloseOnboarding = () => {
+    setIsOnboardingOpen(false);
+    if (user?.id) {
+      localStorage.setItem(`onboarding_completed_${user.id}`, "true");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -294,6 +334,14 @@ export const Homepage: React.FC = () => {
           availableProviders={userProviderOptions.map((p) => p.value)}
         />
       </main>
+
+      {/* Provider Onboarding Modal */}
+      <ProviderOnboarding
+        isOpen={isOnboardingOpen}
+        onClose={handleCloseOnboarding}
+        allProviderOptions={allProviderOptions}
+        onSaveProviders={handleSaveOnboardingProviders}
+      />
     </div>
   );
 };
