@@ -137,7 +137,9 @@ export const Homepage: React.FC = () => {
       <div className="min-h-screen bg-gradient-primary flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-primary-light border-t-transparent rounded-full animate-spin" />
-          <p className="text-text-secondary text-lg">Loading your watchlist...</p>
+          <p className="text-text-secondary text-lg">
+            Loading your watchlist...
+          </p>
         </div>
       </div>
     );
@@ -153,12 +155,6 @@ export const Homepage: React.FC = () => {
       </div>
     );
   }
-
-  console.log(
-    "[g] allProviderOptions ",
-    allProviderOptions,
-    userProviderOptions
-  );
 
   return (
     <div className="min-h-screen bg-gradient-primary">
@@ -289,7 +285,9 @@ export const Homepage: React.FC = () => {
                     d="M24 47c6.5 0 12-2.1 16-5.7l-7.3-5.7c-2.2 1.5-5 2.4-8.7 2.4-6.7 0-12.4-4.5-14.4-10.5l-7.3 5.7C6.1 41.1 14 47 24 47z"
                   />
                 </svg>
-                <span className="hidden xs:inline">Create Account with Google</span>
+                <span className="hidden xs:inline">
+                  Create Account with Google
+                </span>
                 <span className="xs:hidden">Sign Up</span>
               </button>
             </div>

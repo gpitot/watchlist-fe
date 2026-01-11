@@ -110,25 +110,6 @@ export const useSearchStreams = () => {
   });
 };
 
-export const useGetTrending = (timeWindow: "day" | "week" = "week") => {
-  return useQuery({
-    queryKey: ["trending", timeWindow],
-    queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke<{
-        movies: Stream[];
-        tvs: Stream[];
-      }>("trending", {
-        method: "POST",
-        body: JSON.stringify({ timeWindow }),
-      });
-      if (error) {
-        throw error;
-      }
-      return data;
-    },
-  });
-};
-
 export const useAddMovie = () => {
   const queryClient = useQueryClient();
   return useMutation(
@@ -147,9 +128,11 @@ export const useAddMovie = () => {
       return data;
     },
     {
-      onMutate: async (
-        newMovie: { id: number; medium: string; streamData?: Stream }
-      ) => {
+      onMutate: async (newMovie: {
+        id: number;
+        medium: string;
+        streamData?: Stream;
+      }) => {
         // Cancel any outgoing refetches to avoid overwriting our optimistic update
         await queryClient.cancelQueries("movies");
 
@@ -380,6 +363,87 @@ export const useGetAllAvailableProviders = () => {
       ).sort();
 
       return uniqueProviders;
+    },
+  });
+};
+export type TrendingItem = {
+  id: number;
+  movie_id: number;
+  trending_rank: number;
+  medium: string;
+  fetched_at: string;
+  name: string;
+  poster_path?: string;
+  release_date?: string;
+  description?: string;
+  is_available: boolean;
+};
+export const useGetTrendingFiltered = (userId?: string) => {
+  const { data: userProviders } = useGetUserProviders(userId);
+  return useQuery({
+    queryKey: ["trending-filtered", userProviders],
+    queryFn: async () => {
+      // Build query based on whether we're filtering by providers
+      const hasProviderFilter = userProviders && userProviders.length > 0;
+
+      const { data, error } = await supabase
+        .from("trending")
+        .select(
+          `
+            id,
+            movie_id,
+            trending_rank,
+            medium,
+            fetched_at,
+            movies!inner(
+              id,
+              title,
+              movie_db_id,
+              description,
+              release_date,
+              poster_path,
+              movie_providers!inner(provider_name, provider_type)
+
+            )
+          `
+        )
+        .gt(
+          "created_at",
+          new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+        ) // only last 7 days
+        .order("trending_rank", { ascending: true });
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const result: TrendingItem[] = data.map((item) => {
+        const movieProviders = item.movies.movie_providers.map(
+          (p) => p.provider_name
+        );
+        const isAvailable = hasProviderFilter
+          ? userProviders
+              .map((p) => p.provider_name)
+              .some((up) => movieProviders.includes(up))
+          : false;
+
+        return {
+          id: item.id,
+          movie_id: item.movie_id,
+          trending_rank: item.trending_rank,
+          medium: item.medium,
+          fetched_at: item.fetched_at,
+          name: item.movies.title,
+          poster_path: item.movies.poster_path ?? undefined,
+          release_date: item.movies.release_date ?? undefined,
+          description: item.movies.description ?? undefined,
+          is_available: isAvailable,
+        };
+      });
+
+      const movies = result.filter((item) => item.medium === "movie");
+      const tvs = result.filter((item) => item.medium === "tv");
+
+      return { movies, tvs };
     },
   });
 };
