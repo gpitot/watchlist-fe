@@ -12,7 +12,7 @@
 - **Routing**: React Router v6
 - **UI Components**: React Aria Components
 - **Backend/Auth**: Supabase (PostgreSQL + Auth + Edge Functions)
-- **Package Manager**: Yarn v4 (Berry)
+- **Package Manager**: Yarn v1 (Classic)
 
 ---
 
