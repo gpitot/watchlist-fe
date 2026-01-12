@@ -15,9 +15,9 @@ const getMovieState = (
     return "watched";
   }
 
-  const hasFreeProviders = movie.movie_providers.some((p) =>
-    availableProviders.includes(p.provider_name ?? "")
-  );
+  const hasFreeProviders = movie.movie_providers
+    .filter((p) => p.provider_type === "free")
+    .some((p) => availableProviders.includes(p.provider_name ?? ""));
 
   if (hasFreeProviders) {
     return "available";
@@ -118,13 +118,17 @@ const MovieCard: React.FC<{
                 <h3
                   className={classNames(
                     "font-medium text-base sm:text-lg",
-                    state === "watched" ? "text-text-secondary" : "text-text-primary"
+                    state === "watched"
+                      ? "text-text-secondary"
+                      : "text-text-primary"
                   )}
                 >
                   {movie.title}
                 </h3>
                 {year && (
-                  <span className="text-text-tertiary text-sm flex-shrink-0">({year})</span>
+                  <span className="text-text-tertiary text-sm flex-shrink-0">
+                    ({year})
+                  </span>
                 )}
               </div>
               <StateIndicator state={state} />
@@ -200,7 +204,8 @@ const TableUI: React.FC<{
           <h2 className="text-lg md:text-xl font-medium text-text-primary">
             Your Watchlist
             <span className="text-text-tertiary font-normal ml-2">
-              ({filteredData.length} {filteredData.length === 1 ? "title" : "titles"})
+              ({filteredData.length}{" "}
+              {filteredData.length === 1 ? "title" : "titles"})
             </span>
           </h2>
           <div className="flex items-center gap-2 text-sm overflow-x-auto pb-2 -mb-2 md:pb-0 md:mb-0">

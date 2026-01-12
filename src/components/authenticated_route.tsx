@@ -15,8 +15,5 @@ export const AuthenticatedRoute: React.FC<PropsWithChildren> = ({
     }
   }, [loading, isLoggedIn]);
 
-  if (loading) {
-    return <h1>Loading...</h1>;
-  }
   return children;
 };

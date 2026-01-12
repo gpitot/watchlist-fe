@@ -419,9 +419,9 @@ export const useGetTrendingFiltered = (userId?: string) => {
       }
 
       const result: TrendingItem[] = data.map((item) => {
-        const movieProviders = item.movies.movie_providers.map(
-          (p) => p.provider_name
-        );
+        const movieProviders = item.movies.movie_providers
+          .filter((p) => p.provider_type === "free")
+          .map((p) => p.provider_name);
         const isAvailable = hasProviderFilter
           ? userProviders
               .map((p) => p.provider_name)
