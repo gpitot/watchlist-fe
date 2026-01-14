@@ -384,6 +384,7 @@ export const useGetTrendingFiltered = (userId?: string) => {
   const { data: userProviders } = useGetUserProviders(userId);
   return useQuery({
     queryKey: ["trending-filtered", userProviders],
+    enabled: userId !== undefined,
     queryFn: async () => {
       // Build query based on whether we're filtering by providers
       const hasProviderFilter = userProviders && userProviders.length > 0;
