@@ -80,9 +80,7 @@ const TrendingCard: React.FC<{
 
         <p className="mt-0.5 text-text-tertiary text-xs flex items-center justify-between gap-2">
           {year && <span>{year}</span>}
-          <StateIndicator
-            state={stream.is_available ? "available" : "unavailable"}
-          />
+          {stream.is_available && <StateIndicator state="available" />}
         </p>
       </div>
     </button>
