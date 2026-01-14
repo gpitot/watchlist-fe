@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+.yarn/
+.pnp.*
+
+# Build outputs
+dist/
+build/
+out/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Generated files
+*.log
+*.tsbuildinfo
+src/interfaces/database.types.ts
+supabase/functions/_shared/database.types.ts
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Supabase
+.supabase/
+
+# Markdown (optional - remove if you want to format markdown)
+# *.md
+
+# HTML (optional - remove if you want to format HTML)
+# *.html
