@@ -87,7 +87,7 @@ const Results: React.FC<{
   const hasTvs = data.tvs.length > 0;
 
   return (
-    <div className="absolute z-20 top-full left-0 right-0 mt-2 max-h-[60vh] overflow-y-auto rounded-xl bg-slate-900 border border-white/10 shadow-2xl shadow-black/50">
+    <div className="absolute z-30 top-full left-0 right-0 mt-2 max-h-[60vh] overflow-y-auto rounded-xl bg-slate-900 border border-white/10 shadow-2xl shadow-black/50">
       {!hasMovies && !hasTvs && (
         <div className="p-4 text-center text-white/50 text-sm">
           No results found
