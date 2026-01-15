@@ -12,7 +12,7 @@ const Result: React.FC<{
 
   return (
     <button
-      className="w-full flex items-center gap-3 p-3 hover:bg-white/10 transition-colors text-left"
+      className="w-full flex items-center gap-3 p-3 hover:bg-surface-hover transition-colors text-left"
       onClick={() =>
         handleAdd({ id: item.id, medium: item.medium, streamData: item })
       }
@@ -24,9 +24,9 @@ const Result: React.FC<{
           className="w-10 h-14 object-cover rounded-md flex-shrink-0"
         />
       ) : (
-        <div className="w-10 h-14 rounded-md bg-white/10 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-14 rounded-md bg-surface flex items-center justify-center flex-shrink-0">
           <svg
-            className="w-5 h-5 text-white/30"
+            className="w-5 h-5 text-text-tertiary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -41,15 +41,15 @@ const Result: React.FC<{
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <p className="text-white text-sm font-medium truncate">{item.name}</p>
+        <p className="text-text-primary text-sm font-medium truncate">{item.name}</p>
         <div className="flex items-center gap-2 mt-0.5">
-          {year && <span className="text-white/50 text-xs">{year}</span>}
+          {year && <span className="text-text-secondary text-xs">{year}</span>}
           <span
             className={classNames(
               "text-xs px-1.5 py-0.5 rounded",
               isTV
-                ? "bg-green-500/20 text-green-300"
-                : "bg-blue-500/20 text-blue-300"
+                ? "bg-success/20 text-success-lighter border border-success/30"
+                : "bg-info/20 text-info-lighter border border-info/30"
             )}
           >
             {isTV ? "TV" : "Movie"}
@@ -57,7 +57,7 @@ const Result: React.FC<{
         </div>
       </div>
       <svg
-        className="w-5 h-5 text-white/30 flex-shrink-0"
+        className="w-5 h-5 text-text-tertiary flex-shrink-0"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -87,21 +87,21 @@ const Results: React.FC<{
   const hasTvs = data.tvs.length > 0;
 
   return (
-    <div className="absolute z-30 top-full left-0 right-0 mt-2 max-h-[60vh] overflow-y-auto rounded-xl bg-slate-900 border border-white/10 shadow-2xl shadow-black/50">
+    <div className="absolute z-30 top-full left-0 right-0 mt-2 max-h-[60vh] overflow-y-auto rounded-xl bg-tertiary border border-border-default shadow-2xl shadow-black/50">
       {!hasMovies && !hasTvs && (
-        <div className="p-4 text-center text-white/50 text-sm">
+        <div className="p-4 text-center text-text-secondary text-sm">
           No results found
         </div>
       )}
 
       {hasMovies && (
         <>
-          <div className="sticky top-0 px-3 py-2 bg-slate-800/90 backdrop-blur border-b border-white/10">
-            <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+          <div className="sticky top-0 px-3 py-2 bg-surface/90 backdrop-blur border-b border-border-default">
+            <h3 className="text-xs font-medium text-text-secondary uppercase tracking-wider">
               Movies
             </h3>
           </div>
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-border-default">
             {data.movies.map((item) => (
               <Result key={item.id} item={item} handleAdd={handleAdd} />
             ))}
@@ -111,12 +111,12 @@ const Results: React.FC<{
 
       {hasTvs && (
         <>
-          <div className="sticky top-0 px-3 py-2 bg-slate-800/90 backdrop-blur border-b border-white/10">
-            <h3 className="text-xs font-medium text-white/50 uppercase tracking-wider">
+          <div className="sticky top-0 px-3 py-2 bg-surface/90 backdrop-blur border-b border-border-default">
+            <h3 className="text-xs font-medium text-text-secondary uppercase tracking-wider">
               TV Shows
             </h3>
           </div>
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-border-default">
             {data.tvs.map((item) => (
               <Result key={item.id} item={item} handleAdd={handleAdd} />
             ))}
@@ -166,7 +166,7 @@ const AddMovie: React.FC = () => {
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <svg
-            className="w-5 h-5 text-white/40"
+            className="w-5 h-5 text-text-secondary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -181,7 +181,7 @@ const AddMovie: React.FC = () => {
         </div>
         <input
           type="text"
-          className="w-full pl-10 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all"
+          className="w-full pl-10 pr-10 py-2.5 bg-surface border border-border-default rounded-xl text-text-primary placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all"
           placeholder="Search movies or TV shows..."
           onChange={handleChange}
           value={title}
@@ -194,7 +194,7 @@ const AddMovie: React.FC = () => {
           {!isSearchLoading && title && (
             <button
               onClick={() => setTitle("")}
-              className="p-1 rounded-full hover:bg-white/10 text-white/40 hover:text-white transition-colors"
+              className="p-1 rounded-full hover:bg-surface-hover text-text-secondary hover:text-text-primary transition-colors"
             >
               <svg
                 className="w-4 h-4"
