@@ -104,7 +104,7 @@ async function ensureMovieExists(
 async function processTrendingForMedium(
   medium: Medium
 ): Promise<{ movie_id: number; trending_rank: number; medium: Medium }[]> {
-  const trending = await movieService.getTrending(medium, "week");
+  const trending = await movieService.getTrending(medium, "day");
 
   const results: { movie_id: number; trending_rank: number; medium: Medium }[] =
     [];
