@@ -42,18 +42,18 @@ export const MultiSelect: React.FC<{
       <Button
         ref={triggerRef}
         aria-label={label}
-        className="w-full flex items-center gap-2 px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-left focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all cursor-pointer hover:bg-white/10"
+        className="w-full flex items-center gap-2 px-3 py-2.5 bg-surface border border-border-default rounded-xl text-left focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all cursor-pointer hover:bg-surface-hover"
       >
         <div className="flex-1 flex flex-wrap gap-1.5 min-h-[1.5rem]">
           {selected.length === 0 ? (
-            <span className="text-white/40 text-sm">
+            <span className="text-text-tertiary text-sm">
               Select streaming services...
             </span>
           ) : (
             selected.map((item) => (
               <span
                 key={item.value}
-                className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-500/20 text-purple-300 text-xs rounded-md border border-purple-500/30"
+                className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/20 text-primary-lighter text-xs rounded-md border border-primary/30"
               >
                 {item.label}
                 <button
@@ -61,7 +61,7 @@ export const MultiSelect: React.FC<{
                     e.stopPropagation();
                     removeItem(item.value);
                   }}
-                  className="hover:text-white transition-colors"
+                  className="hover:text-text-primary transition-colors"
                 >
                   <svg
                     className="w-3 h-3"
@@ -82,7 +82,7 @@ export const MultiSelect: React.FC<{
           )}
         </div>
         <svg
-          className={`w-4 h-4 text-white/40 flex-shrink-0 transition-transform ${
+          className={`w-4 h-4 text-text-secondary flex-shrink-0 transition-transform ${
             isOpen ? "rotate-180" : ""
           }`}
           fill="none"
@@ -101,7 +101,7 @@ export const MultiSelect: React.FC<{
       <Popover
         triggerRef={triggerRef}
         placement="bottom start"
-        className="w-[--trigger-width] mt-2 bg-slate-900 border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95"
+        className="w-[--trigger-width] mt-2 bg-tertiary border border-border-default rounded-xl shadow-2xl shadow-black/50 overflow-hidden entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95"
       >
         <Dialog className="outline-none">
           <ListBox
@@ -118,7 +118,7 @@ export const MultiSelect: React.FC<{
                 key={option.value}
                 id={option.value}
                 textValue={option.label}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-white/80 rounded-lg cursor-pointer outline-none focus:bg-white/10 hover:bg-white/10 selected:bg-purple-500/20 selected:text-purple-300 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-sm text-text-primary rounded-lg cursor-pointer outline-none focus:bg-surface-hover hover:bg-surface-hover selected:bg-primary/20 selected:text-primary-lighter transition-colors"
               >
                 {({ isSelected }) => (
                   <>
@@ -126,7 +126,7 @@ export const MultiSelect: React.FC<{
                       className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
                         isSelected
                           ? "bg-purple-500 border-purple-500"
-                          : "border-white/30"
+                          : "border-border-default"
                       }`}
                     >
                       {isSelected && (
