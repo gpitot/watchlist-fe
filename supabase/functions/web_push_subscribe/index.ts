@@ -1,6 +1,6 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import * as webpush from "@negrel/webpush";
-import { createClient } from "supabase";
+import { createClient } from "@supabase/supabase-js";
 import { Database } from "../_shared/database.types.ts";
 import { z } from "zod";
 

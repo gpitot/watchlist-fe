@@ -2,7 +2,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { checkCronAuth } from "../_shared/cron-auth.ts";
 import { Database } from "../_shared/database.types.ts";
 import { MovieAndShowService, Medium } from "../_shared/movie_service.ts";
-import { createClient } from "supabase";
+import { createClient } from "@supabase/supabase-js";
 
 const movieService = new MovieAndShowService();
 
