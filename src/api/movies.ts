@@ -405,16 +405,16 @@ export const useGetTrendingFiltered = (userId?: string) => {
               description,
               release_date,
               poster_path,
-              movie_providers!inner(provider_name, provider_type)
-
+              movie_providers!left(provider_name, provider_type)
             )
           `
         )
         .gt(
           "created_at",
-          new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-        ) // only last 7 days
-        .order("trending_rank", { ascending: true });
+          new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+        ) // only last 2 days
+        .order("created_at", { ascending: false })
+        .limit(40);
       if (error) {
         throw new Error(error.message);
       }
@@ -442,6 +442,8 @@ export const useGetTrendingFiltered = (userId?: string) => {
           is_available: isAvailable,
         };
       });
+
+      result.sort((a, b) => a.trending_rank - b.trending_rank);
 
       const movies = result.filter((item) => item.medium === "movie");
       const tvs = result.filter((item) => item.medium === "tv");
