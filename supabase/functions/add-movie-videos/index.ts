@@ -2,7 +2,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { Database } from "../_shared/database.types.ts";
 import { isMedium } from "../_shared/movie_service.ts";
 import { MovieAndShowService } from "../_shared/movie_service.ts";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "supabase";
 
 import { z } from "zod";
 

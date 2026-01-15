@@ -1,6 +1,6 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { Database } from "../_shared/database.types.ts";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "supabase";
 import type { SendData } from "../_shared/email.ts";
 import { checkCronAuth } from "../_shared/cron-auth.ts";
 

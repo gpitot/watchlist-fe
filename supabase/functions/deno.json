@@ -4,10 +4,10 @@
     "lib": ["deno.window"]
   },
   "imports": {
-    "@supabase/supabase-js": "npm:@supabase/supabase-js@^2.90.1",
-    "zod": "npm:zod@^4.3.5",
-    "string-similarity": "npm:string-similarity@^4.0.4",
-    "@negrel/webpush": "jsr:@negrel/webpush@^0.5.0",
-    "@sendgrid/mail": "npm:@sendgrid/mail@^8.1.6"
+    "zod": "https://deno.land/x/zod@v3.22.4/mod.ts",
+    "supabase": "https://esm.sh/@supabase/supabase-js@2",
+    "string-similarity": "https://deno.land/x/string_similarity/mod.ts",
+    "@negrel/webpush": "jsr:@negrel/webpush",
+    "@sendgrid/mail": "npm:@sendgrid/mail"
   }
 }
