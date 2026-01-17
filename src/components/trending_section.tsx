@@ -1,32 +1,27 @@
-import {
-  Stream,
-  TrendingItem,
-  useAddMovie,
-  useGetTrendingFiltered,
-} from "api/movies";
+import { TrendingItem, useGetTrendingFiltered } from "api/movies";
 import classNames from "classnames";
 import { StateIndicator } from "pages/movies";
 import { useUserContext } from "providers/user_provider";
+import { useState } from "react";
+import { MovieModal } from "pages/movie-modal";
 
 const TrendingCard: React.FC<{
   item: TrendingItem;
-  onAdd: (body: { id: number; medium: string; streamData: Stream }) => void;
-}> = ({ item: stream, onAdd }) => {
+  onClick: (item: TrendingItem) => void;
+}> = ({ item: stream, onClick }) => {
   const year = stream.release_date ? stream.release_date.slice(0, 4) : null;
   const isTV = stream.medium === "tv";
 
   return (
     <button
-      onClick={() =>
-        onAdd({ id: stream.id, medium: stream.medium, streamData: stream })
-      }
+      onClick={() => onClick(stream)}
       className="flex-shrink-0 w-32 sm:w-36 group"
     >
       <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-surface-hover">
         {stream.poster_path ? (
           <img
             src={stream.poster_path}
-            alt={stream.name}
+            alt={stream.title}
             className="w-full h-full object-cover transition-transform group-hover:scale-105"
           />
         ) : (
@@ -46,36 +41,15 @@ const TrendingCard: React.FC<{
             </svg>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-overlay/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
-          <span className="text-contrast text-xs font-medium flex items-center gap-1">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Add
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
+          <span className="text-contrast text-xs font-medium">
+            View Details
           </span>
-        </div>
-        <div
-          className={classNames(
-            "absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded font-medium",
-            isTV ? "bg-success/90 text-contrast" : "bg-info/90 text-contrast"
-          )}
-        >
-          {isTV ? "TV" : "Movie"}
         </div>
       </div>
       <div className="mt-2 text-left">
         <p className="text-text-primary text-sm font-medium truncate">
-          {stream.name}
+          {stream.title}
         </p>
 
         <p className="mt-0.5 text-text-tertiary text-xs flex items-center justify-between gap-2">
@@ -90,14 +64,19 @@ const TrendingCard: React.FC<{
 export const TrendingSection: React.FC = () => {
   const { user } = useUserContext();
   const { data, isLoading } = useGetTrendingFiltered(user?.id);
-  const { mutate: addMovie } = useAddMovie();
+  const [selectedTrending, setSelectedTrending] = useState<TrendingItem | null>(
+    null,
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAdd = (body: {
-    id: number;
-    medium: string;
-    streamData: Stream;
-  }) => {
-    addMovie(body);
+  const handleClick = (item: TrendingItem) => {
+    setSelectedTrending(item);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedTrending(null);
   };
 
   if (isLoading) {
@@ -151,7 +130,7 @@ export const TrendingSection: React.FC = () => {
           </h3>
           <div className="flex gap-4 overflow-x-auto pb-2 -mx-3 px-3 sm:-mx-6 sm:px-6 scrollbar-hide">
             {data.movies.map((item) => (
-              <TrendingCard key={item.id} item={item} onAdd={handleAdd} />
+              <TrendingCard key={item.id} item={item} onClick={handleClick} />
             ))}
           </div>
         </div>
@@ -164,11 +143,18 @@ export const TrendingSection: React.FC = () => {
           </h3>
           <div className="flex gap-4 overflow-x-auto pb-2 -mx-3 px-3 sm:-mx-6 sm:px-6 scrollbar-hide">
             {data.tvs.map((item) => (
-              <TrendingCard key={item.id} item={item} onAdd={handleAdd} />
+              <TrendingCard key={item.id} item={item} onClick={handleClick} />
             ))}
           </div>
         </div>
       )}
+
+      <MovieModal
+        movie={selectedTrending ?? undefined}
+        isTrendingMovie={true}
+        isOpen={isModalOpen}
+        onModalClose={handleModalClose}
+      />
     </div>
   );
 };

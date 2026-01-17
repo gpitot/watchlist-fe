@@ -63,7 +63,7 @@ export const useGetMovies = (userId?: string) => {
             movies_genres(genre), 
             movie_providers(provider_name, provider_type)
           )
-          `
+          `,
         )
         .match({ user_id: userId })
         .order("created_at", { ascending: false });
@@ -164,7 +164,7 @@ export const useAddMovie = () => {
             "movies",
             {
               movies: [optimisticMovie, ...previousMovies.movies],
-            }
+            },
           );
         }
 
@@ -174,7 +174,7 @@ export const useAddMovie = () => {
       onError: (
         _err: unknown,
         _newMovie: { id: number; medium: string; streamData?: Stream },
-        context?: { previousMovies?: { movies: MovieDetailsResponse[] } }
+        context?: { previousMovies?: { movies: MovieDetailsResponse[] } },
       ) => {
         // If the mutation fails, use the context returned from onMutate to roll back
         if (context?.previousMovies) {
@@ -185,7 +185,7 @@ export const useAddMovie = () => {
         // Always refetch after error or success to ensure we have the correct server state
         queryClient.invalidateQueries("movies");
       },
-    }
+    },
   );
 };
 
@@ -266,7 +266,7 @@ export const useRefreshProviders = () => {
         "refresh_providers",
         {
           method: "POST",
-        }
+        },
       );
       if (error) {
         throw error;
@@ -289,7 +289,7 @@ export const useGetUserProviders = (userId?: string) => {
         .select(
           `
           provider_name
-          `
+          `,
         )
         .match({ id: userId });
 
@@ -333,7 +333,7 @@ export const useUpdateUserProviders = () => {
           providersAdded.map((provider_name) => ({
             id: user.id,
             provider_name,
-          }))
+          })),
         );
       }
     },
@@ -361,25 +361,18 @@ export const useGetAllAvailableProviders = () => {
 
       // Get unique provider names and sort them
       const uniqueProviders = Array.from(
-        new Set(data.map((p: { provider_name: string }) => p.provider_name))
+        new Set(data.map((p: { provider_name: string }) => p.provider_name)),
       ).sort();
 
       return uniqueProviders;
     },
   });
 };
-export type TrendingItem = {
-  id: number;
-  movie_id: number;
+export type TrendingItem = MovieDetailsResponse & {
   trending_rank: number;
-  medium: string;
-  fetched_at: string;
-  name: string;
-  poster_path?: string;
-  release_date?: string;
-  description?: string;
   is_available: boolean;
 };
+
 export const useGetTrendingFiltered = (userId?: string) => {
   const { data: userProviders } = useGetUserProviders(userId);
   return useQuery({
@@ -398,20 +391,25 @@ export const useGetTrendingFiltered = (userId?: string) => {
             trending_rank,
             medium,
             fetched_at,
+            
             movies!inner(
               id,
               title,
               movie_db_id,
               description,
+              production,
               release_date,
               poster_path,
-              movie_providers!left(provider_name, provider_type)
+              movie_providers!left(provider_name, provider_type),
+              movie_credits!left(name, role), 
+              movies_genres!left(genre),
+              created_at
             )
-          `
+          `,
         )
         .gt(
           "created_at",
-          new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+          new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         ) // only last 2 days
         .order("created_at", { ascending: false })
         .limit(40);
@@ -430,17 +428,22 @@ export const useGetTrendingFiltered = (userId?: string) => {
           : false;
 
         return {
-          id: item.id,
-          movie_id: item.movie_id,
+          id: item.movies.movie_db_id,
           trending_rank: item.trending_rank,
           medium: item.medium,
-          fetched_at: item.fetched_at,
-          name: item.movies.title,
+          created_at: item.movies.created_at,
+          title: item.movies.title,
+          production: item.movies.production,
+          watched: false,
+          rating: null,
+          movie_credits: item.movies.movie_credits,
+          movies_genres: item.movies.movies_genres,
+          movie_providers: item.movies.movie_providers,
           poster_path: item.movies.poster_path ?? undefined,
           release_date: item.movies.release_date ?? undefined,
-          description: item.movies.description ?? undefined,
+          description: item.movies.description ?? null,
           is_available: isAvailable,
-        };
+        } satisfies TrendingItem;
       });
 
       result.sort((a, b) => a.trending_rank - b.trending_rank);
