@@ -26,16 +26,16 @@ export const ViewMemory: React.FC = () => {
     <div className="space-y-2">
       <div>
         <label className="text-sm">Question</label>
-        <h1 className="text-xl border-2 p-2 border-gray-600">{data?.memory}</h1>
+        <h1 className="text-xl border-2 p-2 border-border-default">{data?.memory}</h1>
       </div>
       <div>
         <label className="text-sm">Answer</label>
         <button
           onClick={() => setRevealAnswer(true)}
           className={classNames(
-            `text-xl border-2 p-2 border-gray-600 block w-full text-left`,
+            `text-xl border-2 p-2 border-border-default block w-full text-left`,
             {
-              "bg-slate-800 text-white": !revealAnswer,
+              "bg-bg-tertiary text-text-primary": !revealAnswer,
             }
           )}
         >

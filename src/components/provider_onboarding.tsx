@@ -28,14 +28,14 @@ export const ProviderOnboarding: React.FC<ProviderOnboardingProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full max-w-2xl bg-gradient-to-br from-slate-900 via-purple-900/50 to-slate-900 rounded-2xl border border-white/10 shadow-2xl shadow-black/50 animate-in zoom-in-95 duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-overlay/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full max-w-2xl bg-gradient-primary rounded-2xl border border-border-default shadow-2xl shadow-primary animate-in zoom-in-95 duration-300">
         <div className="p-6 sm:p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/50">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-accent flex items-center justify-center shadow-lg shadow-primary">
               <svg
-                className="w-8 h-8 text-white"
+                className="w-8 h-8 text-contrast"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -79,14 +79,14 @@ export const ProviderOnboarding: React.FC<ProviderOnboardingProps> = ({
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={handleSkip}
-              className="flex-1 px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-text-secondary hover:text-text-primary transition-all font-medium active:scale-95"
+              className="flex-1 px-6 py-3 rounded-xl bg-surface hover:bg-surface-hover border border-border-default hover:border-border-hover text-text-secondary hover:text-text-primary transition-all font-medium active:scale-95"
             >
               Skip for now
             </button>
             <button
               onClick={handleContinue}
               disabled={selectedProviders.length === 0}
-              className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-medium shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-purple-600 disabled:hover:to-pink-600 active:scale-95"
+              className="flex-1 px-6 py-3 rounded-xl bg-gradient-accent text-contrast font-medium shadow-lg shadow-primary hover:shadow-primary-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
             >
               {selectedProviders.length === 0
                 ? "Select providers to continue"

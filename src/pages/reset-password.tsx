@@ -67,13 +67,13 @@ export const ResetPasswordPage: React.FC = () => {
             />
 
             {submitError && !modifiedSinceLastSubmit && (
-              <span className="text-red-500 text-sm italic">{submitError}</span>
+              <span className="text-error text-sm italic">{submitError}</span>
             )}
 
             <button
               type="submit"
               disabled={isLoading || !valid}
-              className="border-2 bg-slate-500 text-white p-2 rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="border-2 bg-primary text-contrast p-2 rounded-md disabled:bg-surface disabled:cursor-not-allowed"
             >
               Submit
             </button>

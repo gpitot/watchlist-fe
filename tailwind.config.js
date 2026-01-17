@@ -33,6 +33,22 @@ export default {
         'error-light': 'rgb(var(--color-error-light) / <alpha-value>)',
         'error-lighter': 'rgb(var(--color-error-lighter) / <alpha-value>)',
 
+        // Warning colors (ratings, stars)
+        'warning': 'rgb(var(--color-warning) / <alpha-value>)',
+        'warning-light': 'rgb(var(--color-warning-light) / <alpha-value>)',
+
+        // Info colors (badges, indicators)
+        'info': 'rgb(var(--color-info) / <alpha-value>)',
+        'info-light': 'rgb(var(--color-info-light) / <alpha-value>)',
+
+        // Overlay colors
+        'overlay': 'rgb(var(--color-overlay) / <alpha-value>)',
+        'overlay-light': 'rgb(var(--color-overlay-light) / <alpha-value>)',
+
+        // Contrast text (for use on colored backgrounds)
+        'contrast': 'rgb(var(--color-contrast) / <alpha-value>)',
+        'contrast-secondary': 'rgb(var(--color-contrast-secondary) / <alpha-value>)',
+
         // Text colors
         'text-primary': 'rgb(var(--color-text-primary) / <alpha-value>)',
         'text-secondary': 'rgb(var(--color-text-secondary) / var(--color-text-secondary-opacity))',

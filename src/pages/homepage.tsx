@@ -164,7 +164,7 @@ export const Homepage: React.FC = () => {
             <Link to="/" className="group flex items-center gap-2 sm:gap-3">
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-accent flex items-center justify-center shadow-primary shadow-lg group-hover:shadow-primary-lg transition-shadow">
                 <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                  className="w-4 h-4 sm:w-5 sm:h-5 text-contrast"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -261,7 +261,7 @@ export const Homepage: React.FC = () => {
               </div>
               <button
                 onClick={handleConvertToPermanent}
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-white hover:bg-gray-100 text-slate-800 font-medium transition-all shadow-lg whitespace-nowrap text-sm active:scale-95"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-overlay-light hover:bg-overlay-light/90 text-overlay font-medium transition-all shadow-lg whitespace-nowrap text-sm active:scale-95"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

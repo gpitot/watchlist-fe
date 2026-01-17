@@ -49,7 +49,7 @@ export const LoginForm: React.FC = () => {
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-accent shadow-primary-lg mb-4">
             <svg
-              className="w-8 h-8 text-white"
+              className="w-8 h-8 text-contrast"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -80,10 +80,10 @@ export const LoginForm: React.FC = () => {
           <button
             onClick={handleSocialLogin}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white hover:bg-gray-100 text-slate-800 font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-overlay-light hover:bg-overlay-light/90 text-overlay font-medium rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
           >
             {isLoading ? (
-              <div className="w-5 h-5 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-text-muted border-t-text-secondary rounded-full animate-spin" />
             ) : (
               <svg
                 xmlns="http://www.w3.org/2000/svg"

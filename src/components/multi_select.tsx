@@ -42,7 +42,7 @@ export const MultiSelect: React.FC<{
       <Button
         ref={triggerRef}
         aria-label={label}
-        className="w-full flex items-center gap-2 px-3 py-2.5 bg-surface border border-border-default rounded-xl text-left focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all cursor-pointer hover:bg-surface-hover"
+        className="w-full flex items-center gap-2 px-3 py-2.5 bg-surface border border-border-default rounded-xl text-left focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all cursor-pointer hover:bg-surface-hover"
       >
         <div className="flex-1 flex flex-wrap gap-1.5 min-h-[1.5rem]">
           {selected.length === 0 ? (
@@ -101,7 +101,7 @@ export const MultiSelect: React.FC<{
       <Popover
         triggerRef={triggerRef}
         placement="bottom start"
-        className="w-[--trigger-width] mt-2 bg-tertiary border border-border-default rounded-xl shadow-2xl shadow-black/50 overflow-hidden entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95"
+        className="w-[--trigger-width] mt-2 bg-tertiary border border-border-default rounded-xl shadow-2xl shadow-primary overflow-hidden entering:animate-in entering:fade-in entering:zoom-in-95 exiting:animate-out exiting:fade-out exiting:zoom-out-95"
       >
         <Dialog className="outline-none">
           <ListBox
@@ -125,13 +125,13 @@ export const MultiSelect: React.FC<{
                     <span
                       className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
                         isSelected
-                          ? "bg-purple-500 border-purple-500"
+                          ? "bg-primary border-primary"
                           : "border-border-default"
                       }`}
                     >
                       {isSelected && (
                         <svg
-                          className="w-3 h-3 text-white"
+                          className="w-3 h-3 text-contrast"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"

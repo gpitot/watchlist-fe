@@ -27,7 +27,7 @@ export const AddMemory: React.FC = () => {
     return (
       <button
         onClick={() => setShow(true)}
-        className="border-2 py-2 px-4 cursor-pointer border-black disabled:bg-gray-400 disabled:text-gray-200"
+        className="border-2 py-2 px-4 cursor-pointer border-border-default disabled:bg-surface disabled:text-text-muted"
       >
         Add memory
       </button>
@@ -40,7 +40,7 @@ export const AddMemory: React.FC = () => {
         <span>Question</span>
         <input
           type="text"
-          className="border-2 p-2 w-full border-black"
+          className="border-2 p-2 w-full border-border-default"
           onChange={handleQuestionChange}
           value={question}
         />
@@ -49,7 +49,7 @@ export const AddMemory: React.FC = () => {
         <span>Answer</span>
         <input
           type="text"
-          className="border-2 p-2 w-full border-black"
+          className="border-2 p-2 w-full border-border-default"
           onChange={handleAnswerChange}
           value={answer}
         />
@@ -58,7 +58,7 @@ export const AddMemory: React.FC = () => {
       <button
         onClick={handleSubmit}
         disabled={question.length === 0 || answer.length === 0}
-        className="border-2 py-2 px-4 cursor-pointer border-black disabled:bg-gray-400 disabled:text-gray-200"
+        className="border-2 py-2 px-4 cursor-pointer border-border-default disabled:bg-surface disabled:text-text-muted"
       >
         Submit
       </button>
