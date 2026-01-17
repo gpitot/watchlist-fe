@@ -1,7 +1,4 @@
-import {
-  TrendingItem,
-  useGetTrendingFiltered,
-} from "api/movies";
+import { TrendingItem, useGetTrendingFiltered } from "api/movies";
 import classNames from "classnames";
 import { StateIndicator } from "pages/movies";
 import { useUserContext } from "providers/user_provider";
@@ -45,12 +42,14 @@ const TrendingCard: React.FC<{
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-3">
-          <span className="text-white text-xs font-medium">View Details</span>
+          <span className="text-contrast text-xs font-medium">
+            View Details
+          </span>
         </div>
         <div
           className={classNames(
             "absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded font-medium",
-            isTV ? "bg-green-500/90 text-white" : "bg-blue-500/90 text-white"
+            isTV ? "bg-success/90 text-contrast" : "bg-info/90 text-contrast"
           )}
         >
           {isTV ? "TV" : "Movie"}
@@ -73,7 +72,9 @@ const TrendingCard: React.FC<{
 export const TrendingSection: React.FC = () => {
   const { user } = useUserContext();
   const { data, isLoading } = useGetTrendingFiltered(user?.id);
-  const [selectedTrending, setSelectedTrending] = useState<TrendingItem | null>(null);
+  const [selectedTrending, setSelectedTrending] = useState<TrendingItem | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleClick = (item: TrendingItem) => {

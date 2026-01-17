@@ -122,7 +122,7 @@ export const NotificationCenter: React.FC = () => {
           />
         </svg>
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold text-white bg-primary rounded-full">
+          <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold text-contrast bg-primary rounded-full">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
@@ -131,7 +131,7 @@ export const NotificationCenter: React.FC = () => {
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 z-10 bg-black/20 sm:bg-transparent"
+            className="fixed inset-0 z-10 bg-overlay/20 sm:bg-transparent"
             onClick={() => setIsOpen(false)}
           />
           <div className="fixed sm:absolute left-4 right-4 sm:left-auto sm:right-0 top-16 sm:top-auto sm:mt-2 max-w-md sm:w-96 rounded-2xl bg-bg-tertiary border border-border-default shadow-primary-lg z-20 overflow-hidden">

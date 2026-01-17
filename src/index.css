@@ -29,6 +29,18 @@
     --color-error-light: 248 113 113; /* red-400 */
     --color-error-lighter: 252 165 165; /* red-300 */
 
+    --color-warning: 234 179 8; /* yellow-500 */
+    --color-warning-light: 250 204 21; /* yellow-400 */
+
+    --color-info: 59 130 246; /* blue-500 */
+    --color-info-light: 96 165 250; /* blue-400 */
+
+    --color-overlay: 0 0 0; /* black */
+    --color-overlay-light: 255 255 255; /* white */
+
+    --color-contrast: 255 255 255; /* white - for text on colored backgrounds */
+    --color-contrast-secondary: 255 255 255; /* white with opacity for secondary text on colored backgrounds */
+
     --color-text-primary: 255 255 255;
     --color-text-secondary: 255 255 255;
     --color-text-secondary-opacity: 0.60;
@@ -69,6 +81,18 @@
     --color-error: 220 38 38; /* red-600 */
     --color-error-light: 239 68 68; /* red-500 */
     --color-error-lighter: 248 113 113; /* red-400 */
+
+    --color-warning: 202 138 4; /* yellow-600 */
+    --color-warning-light: 234 179 8; /* yellow-500 */
+
+    --color-info: 37 99 235; /* blue-600 */
+    --color-info-light: 59 130 246; /* blue-500 */
+
+    --color-overlay: 0 0 0; /* black */
+    --color-overlay-light: 255 255 255; /* white */
+
+    --color-contrast: 255 255 255; /* white - for text on colored backgrounds */
+    --color-contrast-secondary: 229 231 235; /* gray-200 for secondary text on colored backgrounds */
 
     --color-text-primary: 15 23 42; /* slate-900 */
     --color-text-secondary: 51 65 85; /* slate-700 */
@@ -111,6 +135,18 @@
     --color-error-light: 239 68 68; /* red-500 */
     --color-error-lighter: 248 113 113; /* red-400 */
 
+    --color-warning: 234 179 8; /* yellow-500 */
+    --color-warning-light: 250 204 21; /* yellow-400 */
+
+    --color-info: 59 130 246; /* blue-500 */
+    --color-info-light: 96 165 250; /* blue-400 */
+
+    --color-overlay: 0 0 0; /* black */
+    --color-overlay-light: 255 255 255; /* white */
+
+    --color-contrast: 255 255 255; /* white - for text on colored backgrounds */
+    --color-contrast-secondary: 255 255 255; /* white with opacity for secondary text on colored backgrounds */
+
     --color-text-primary: 255 255 255;
     --color-text-secondary: 255 255 255;
     --color-text-secondary-opacity: 0.60;
@@ -151,6 +187,18 @@
     --color-error: 239 68 68; /* red-500 */
     --color-error-light: 248 113 113; /* red-400 */
     --color-error-lighter: 252 165 165; /* red-300 */
+
+    --color-warning: 234 179 8; /* yellow-500 */
+    --color-warning-light: 250 204 21; /* yellow-400 */
+
+    --color-info: 59 130 246; /* blue-500 */
+    --color-info-light: 96 165 250; /* blue-400 */
+
+    --color-overlay: 0 0 0; /* black */
+    --color-overlay-light: 255 255 255; /* white */
+
+    --color-contrast: 255 255 255; /* white - for text on colored backgrounds */
+    --color-contrast-secondary: 255 255 255; /* white with opacity for secondary text on colored backgrounds */
 
     --color-text-primary: 255 255 255;
     --color-text-secondary: 255 255 255;

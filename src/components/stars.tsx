@@ -17,15 +17,15 @@ export const Stars: React.FC<{
               onClick={() => handleClick?.(i)}
               className={classNames(
                 {
-                  "text-yellow-500": isFilled,
-                  "text-gray-500": !isFilled,
+                  "text-warning": isFilled,
+                  "text-text-muted": !isFilled,
                 },
                 {
                   "text-3xl": size === "lg",
                   "text-2xl": size === "md",
                   "text-xl": size === "sm",
                 },
-                "cursor-pointer hover:text-yellow-500"
+                "cursor-pointer hover:text-warning"
               )}
             >
               {isFilled ? "★" : "☆"}
