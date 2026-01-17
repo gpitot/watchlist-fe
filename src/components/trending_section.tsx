@@ -1,5 +1,4 @@
 import { TrendingItem, useGetTrendingFiltered } from "api/movies";
-import classNames from "classnames";
 import { StateIndicator } from "pages/movies";
 import { useUserContext } from "providers/user_provider";
 import { useState } from "react";
@@ -10,7 +9,6 @@ const TrendingCard: React.FC<{
   onClick: (item: TrendingItem) => void;
 }> = ({ item: stream, onClick }) => {
   const year = stream.release_date ? stream.release_date.slice(0, 4) : null;
-  const isTV = stream.medium === "tv";
 
   return (
     <button
