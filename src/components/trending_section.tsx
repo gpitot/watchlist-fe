@@ -21,7 +21,7 @@ const TrendingCard: React.FC<{
         {stream.poster_path ? (
           <img
             src={stream.poster_path}
-            alt={stream.name}
+            alt={stream.title}
             className="w-full h-full object-cover transition-transform group-hover:scale-105"
           />
         ) : (
@@ -46,18 +46,10 @@ const TrendingCard: React.FC<{
             View Details
           </span>
         </div>
-        <div
-          className={classNames(
-            "absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded font-medium",
-            isTV ? "bg-success/90 text-contrast" : "bg-info/90 text-contrast"
-          )}
-        >
-          {isTV ? "TV" : "Movie"}
-        </div>
       </div>
       <div className="mt-2 text-left">
         <p className="text-text-primary text-sm font-medium truncate">
-          {stream.name}
+          {stream.title}
         </p>
 
         <p className="mt-0.5 text-text-tertiary text-xs flex items-center justify-between gap-2">
@@ -73,7 +65,7 @@ export const TrendingSection: React.FC = () => {
   const { user } = useUserContext();
   const { data, isLoading } = useGetTrendingFiltered(user?.id);
   const [selectedTrending, setSelectedTrending] = useState<TrendingItem | null>(
-    null
+    null,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -158,7 +150,8 @@ export const TrendingSection: React.FC = () => {
       )}
 
       <MovieModal
-        trendingItem={selectedTrending ?? undefined}
+        movie={selectedTrending ?? undefined}
+        isTrendingMovie={true}
         isOpen={isModalOpen}
         onModalClose={handleModalClose}
       />
