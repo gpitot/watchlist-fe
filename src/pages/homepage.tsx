@@ -297,7 +297,7 @@ export const Homepage: React.FC = () => {
 
       <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         {isLoggedIn && !isSharing && (
-          <div className="mb-6 sm:mb-8 p-4 sm:p-6 rounded-2xl bg-surface backdrop-blur-sm border border-border-default">
+          <div className="relative z-50 mb-6 sm:mb-8 p-4 sm:p-6 rounded-2xl bg-surface backdrop-blur-sm border border-border-default">
             <div className="flex flex-col lg:flex-row lg:items-center gap-4">
               <div className="flex-1">
                 <AddMovie />
