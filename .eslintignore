@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+.yarn/
+.pnp.*
+
+# Build outputs
+dist/
+build/
+out/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Generated files
+*.log
+*.tsbuildinfo
+src/interfaces/database.types.ts
+supabase/functions/_shared/database.types.ts
+
+# Config files
+.eslintrc.cjs
+vite.config.ts
+tailwind.config.js
+postcss.config.js
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Supabase
+.supabase/
